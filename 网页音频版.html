@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互动词汇阅读器 - U17 & U18</title>
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 强制主容器适应屏幕高度 */
+        #app-container {
+            min-height: 100vh;
+        }
+        /* 自定义滚动条，使其更美观 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* coolGray-300 */
+            border-radius: 4px;
+        }
+        /* 标红单词样式 */
+        .vocab {
+            font-weight: bold;
+            color: #ef4444; /* red-500 */
+            margin-right: 4px;
+        }
+        /* 音标的点击样式 */
+        .phonetic {
+            cursor: pointer;
+            color: #3b82f6; /* blue-500 */
+            font-style: italic;
+            transition: color 0.15s;
+        }
+        .phonetic:hover {
+            color: #1d4ed8; /* blue-700 */
+            text-decoration: underline;
+        }
+        /* 词汇索引样式 */
+        #vocab-sublist ul {
+            padding-right: 0.25rem;
+        }
+        #vocab-sublist li {
+            margin-bottom: 0.4rem;
+        }
+        .vocab-button {
+            width: 100%;
+            text-align: left;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.35rem 0.5rem;
+            font-size: 0.9rem;
+            color: #0f172a;
+            transition: background 0.15s, border 0.15s;
+            cursor: default;
+        }
+        .vocab-button:hover {
+            background: #e0e7ff;
+            border-color: #6366f1;
+        }
+        .vocab-button span {
+            display: block;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+        .vocab-highlight {
+            background-color: #fef3c7;
+            transition: background-color 1s ease;
+        }
+        /* 词汇索引区域样式 */
+        #vocab-index {
+            width: 100%;
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+        @media (min-width: 768px) {
+            #vocab-index {
+                width: 280px;
+            }
+        }
+        /* 针对移动设备的布局调整 */
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            #content-area {
+                width: 100%;
+                padding: 1rem;
+                max-height: none;
+            }
+            #vocab-index {
+                width: 100%;
+                max-height: none;
+                border-top: 1px solid #e5e7eb;
+            }
+        }
+        @media (min-width: 768px) {
+            #content-area {
+                max-height: 100vh;
+                overflow-y: auto;
+            }
+        }
+        /* 标红单词点击样式 */
+        .vocab {
+            cursor: pointer;
+        }
+        .vocab:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div id="app-container" class="flex flex-col md:flex-row">
+        <!-- 左侧目录条 -->
+        <div id="sidebar" class="w-full md:w-48 bg-white border-r border-gray-200 p-4 shadow-lg flex-shrink-0">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">词汇目录</h2>
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" onclick="showContent('u11'); return false;" id="u11-link"
+                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                        U11
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showContent('u12'); return false;" id="u12-link"
+                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                        U12
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showContent('u13'); return false;" id="u13-link"
+                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                        U13
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showContent('u14'); return false;" id="u14-link"
+                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                        U14
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showContent('u15'); return false;" id="u15-link"
+                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                        U15
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showContent('u16'); return false;" id="u16-link"
+                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                        U16
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showContent('u17'); return false;" id="u17-link"
+                       class="block px-4 py-2 text-lg rounded-lg transition-colors duration-200 text-white bg-indigo-600 hover:bg-indigo-700">
+                        U17
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showContent('u18'); return false;" id="u18-link"
+                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                        U18
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showContent('u19'); return false;" id="u19-link"
+                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                        U19
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showContent('u20'); return false;" id="u20-link"
+                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                        U20
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showContent('high_frequency'); return false;" id="high_frequency-link"
+                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                        高频词汇
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 中间内容区域 -->
+        <div id="content-area" class="flex-grow p-8 md:p-12 overflow-y-auto">
+            <div id="loading-spinner" class="hidden text-center mt-20">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500 mx-auto"></div>
+                <p class="mt-4 text-indigo-600">正在加载音频...</p>
+            </div>
+            <div id="content-display" class="bg-white p-6 md:p-10 rounded-xl shadow-2xl">
+                <!-- 内容将在此处显示 -->
+                <h1 id="article-title" class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 border-b pb-4"></h1>
+                <div id="article-body" class="text-gray-700 space-y-8 leading-relaxed">
+                    <p class="text-xl text-center text-gray-500 mt-20" id="initial-message">请从左侧目录选择 U17 或 U18 查看文章。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧词汇索引 -->
+        <div id="vocab-index" class="w-full md:w-72 bg-white border-l border-gray-200 p-4 shadow-lg flex-shrink-0">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">词汇索引</h2>
+            <div id="vocab-sublist">
+                <p class="text-sm text-gray-500">请选择一个单元以加载词汇。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Key for TTS. Leave this empty. Canvas will automatically inject a valid key.
+        const apiKey = "";
+        const ttsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+
+        // --- TTS Helper Functions ---
+        
+        /**
+         * Helper function to write a string to a DataView (used for WAV header).
+         * @param {DataView} view 
+         * @param {number} offset 
+         * @param {string} string 
+         */
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        /**
+         * Converts raw base64 PCM data to a playable WAV Blob.
+         * The API returns signed 16-bit PCM (L16).
+         * @param {string} base64 - Base64 encoded audio data.
+         * @param {number} sampleRate - Sample rate extracted from the API response mimeType.
+         * @returns {Blob} - A WAV audio blob.
+         */
+        function pcmToWav(base64, sampleRate) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const pcmData = new Int16Array(len / 2);
+            for (let i = 0, j = 0; i < len; i += 2, j++) {
+                // Little-endian reading for Int16
+                pcmData[j] = binaryString.charCodeAt(i) | (binaryString.charCodeAt(i + 1) << 8);
+            }
+            
+            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+            const view = new DataView(buffer);
+
+            // RIFF chunk
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + pcmData.length * 2, true);
+            writeString(view, 8, 'WAVE');
+            
+            // fmt chunk
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true); // Chunk size
+            view.setUint16(20, 1, true);  // Audio format (1 for PCM)
+            view.setUint16(22, 1, true);  // Number of channels (Mono)
+            view.setUint32(24, sampleRate, true); // Sample rate
+            view.setUint32(28, sampleRate * 2, true); // Byte rate (SampleRate * NumChannels * BitsPerSample/8)
+            view.setUint16(32, 2, true);  // Block align (NumChannels * BitsPerSample/8)
+            view.setUint16(34, 16, true); // Bits per sample
+            
+            // data chunk
+            writeString(view, 36, 'data');
+            view.setUint32(40, pcmData.length * 2, true);
+
+            // Write PCM data
+            let offset = 44;
+            for (let i = 0; i < pcmData.length; i++) {
+                view.setInt16(offset, pcmData[i], true);
+                offset += 2;
+            }
+
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        /**
+         * Converts base64-encoded data to a Blob with the provided mime type.
+         * @param {string} base64
+         * @param {string} mimeType
+         * @returns {Blob}
+         */
+        function base64ToBlob(base64, mimeType) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return new Blob([bytes], { type: mimeType });
+        }
+
+        /**
+         * Generates and plays the audio for a given word using the TTS API.
+         * @param {string} word The word to speak.
+         * @param {string} voice The voice name for TTS.
+         */
+        async function speakWord(word, voice = 'Zephyr') {
+            const spinner = document.getElementById('loading-spinner');
+            
+            // Fallback to Web Speech API if no API key is available
+            if (!apiKey || apiKey.trim() === '') {
+                try {
+                    if ('speechSynthesis' in window) {
+                        const utter = new SpeechSynthesisUtterance(word);
+                        utter.lang = 'en-US';
+                        utter.rate = 0.95;
+                        utter.pitch = 0.9;
+                        const voices = window.speechSynthesis.getVoices();
+                        const enVoice = voices.find(v => /en-US|en-GB/i.test(v.lang));
+                        if (enVoice) utter.voice = enVoice;
+                        utter.onend = () => spinner.classList.add('hidden');
+                        window.speechSynthesis.speak(utter);
+                        return;
+                    } else {
+                        throw new Error('SpeechSynthesis not supported');
+                    }
+                } catch (e) {
+                    console.error('Speech fallback failed:', e);
+                    spinner.classList.add('hidden');
+                    const body = document.getElementById('article-body');
+                    const errorMsg = document.createElement('p');
+                    errorMsg.className = 'text-center text-red-500 mt-4';
+                    errorMsg.textContent = '该浏览器不支持发音，请更换浏览器或稍后再试。';
+                    body.appendChild(errorMsg);
+                    setTimeout(() => errorMsg.remove(), 5000);
+                    return;
+                }
+            }
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: word }]
+                }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: { voiceName: voice }
+                        }
+                    }
+                },
+                model: "gemini-2.5-flash-preview-tts"
+            };
+
+            const maxRetries = 3;
+            let lastError = null;
+
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(ttsApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const part = result?.candidates?.[0]?.content?.parts?.[0];
+                    const audioData = part?.inlineData?.data;
+                    const mimeType = part?.inlineData?.mimeType;
+
+                    if (audioData && mimeType && mimeType.startsWith("audio/")) {
+                        let blob;
+                        if (mimeType.startsWith("audio/L16")) {
+                            // Extract sample rate from mimeType, e.g., audio/L16;rate=24000
+                            const rateMatch = mimeType.match(/rate=(\d+)/);
+                            const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
+                            blob = pcmToWav(audioData, sampleRate);
+                        } else {
+                            // e.g., audio/wav, audio/mpeg, audio/ogg
+                            blob = base64ToBlob(audioData, mimeType);
+                        }
+
+                        const audioUrl = URL.createObjectURL(blob);
+                        const audio = new Audio(audioUrl);
+                        audio.play();
+                        audio.onended = () => {
+                            URL.revokeObjectURL(audioUrl);
+                            spinner.classList.add('hidden');
+                        };
+                        return; // Success
+                    }
+                    throw new Error("Invalid audio response structure from TTS API.");
+                } catch (error) {
+                    lastError = error;
+                    console.error(`TTS Request failed on attempt ${attempt + 1}:`, error);
+                    if (attempt < maxRetries - 1) {
+                        const delay = Math.pow(2, attempt) * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    }
+                }
+            }
+
+            // If all retries fail
+            spinner.classList.add('hidden');
+            console.error("Failed to generate and play audio after multiple retries.", lastError);
+            const body = document.getElementById('article-body');
+            const errorMsg = document.createElement('p');
+            errorMsg.className = 'text-center text-red-500 mt-4';
+            errorMsg.textContent = '发音失败，请稍后再试。';
+            body.appendChild(errorMsg);
+            setTimeout(() => errorMsg.remove(), 5000);
+        }
+
+        // --- Content Data Structure ---
+
+        const contentData = {
+            'u11': {
+                title: "Urban Transformation Chronicle",
+                paragraphs: [
+                    { en: "The <span class=\"vocab\">metropolitan</span> /ˌmetrəˈpɒlɪtən/ council faced a <span class=\"vocab\">principal</span> /ˈprɪnsəpl/ challenge: how to <span class=\"vocab\">endose</span> /ɪnˈdɔːs/ a sustainable development plan that would not <span class=\"vocab\">undermine</span> /ˌʌndəˈmaɪn/ the city's <span class=\"vocab\">intrinsic</span> /ɪnˈtrɪnsɪk/ character.", zh: "大都会委员会面临一个主要挑战：如何支持一个不会削弱城市内在特征的可持续发展计划。"},
+                    { en: "A fierce <span class=\"vocab\">rivalry</span> /ˈraɪvəlri/ emerged between the mayor and his <span class=\"vocab\">rival</span> /ˈraɪvl/, leaving the architect feeling <span class=\"vocab\">solitary</span> /ˈsɒlɪtəri/ in his efforts to address the issues that <span class=\"vocab\">underlie</span> /ˌʌndəˈlaɪ/ urban decay.", zh: "市长和他的对手之间出现了激烈的竞争，让建筑师在努力解决构成城市衰败基础的问题时感到孤独。"},
+                    { en: "The plan would <span class=\"vocab\">pave</span> /peɪv/ the way for new infrastructure, but officials remained <span class=\"vocab\">indifferent</span> /ɪnˈdɪfrənt/ to families struggling with <span class=\"vocab\">mortgage</span> /ˈmɔːɡɪdʒ/ payments and facing heavy <span class=\"vocab\">penalty</span> /ˈpenəlti/ fees.", zh: "该计划将为新基础设施铺路，但官员们对正在努力偿还抵押贷款并面临重罚的家庭仍然漠不关心。"},
+                    { en: "They needed to <span class=\"vocab\">repay</span> /rɪˈpeɪ/ their debts and prove that new systems were <span class=\"vocab\">compatible</span> /kəmˈpætəbl/ with existing structures, or risk a <span class=\"vocab\">fatal</span> /ˈfeɪtl/ system failure that could <span class=\"vocab\">warrant</span> /ˈwɒrənt/ immediate action.", zh: "他们需要偿还债务，并证明新系统与现有结构兼容，否则可能面临致命的系统故障，这需要立即采取行动。"},
+                    { en: "Only <span class=\"vocab\">eligible</span> /ˈelɪdʒəbl/ residents could participate in the program designed to <span class=\"vocab\">induce</span> /ɪnˈdjuːs/ positive change through an <span class=\"vocab\">epic</span> /ˈepɪk/ community initiative that would <span class=\"vocab\">readily</span> /ˈredɪli/ transform the neighborhood.", zh: "只有符合条件的居民才能参与这个旨在通过史诗般的社区倡议轻易地诱导积极变化的项目。"},
+                    { en: "An <span class=\"vocab\">exclusive</span> /ɪkˈskluːsɪv/ research facility allowed scientists to <span class=\"vocab\">magnify</span> /ˈmæɡnɪfaɪ/ their findings, create <span class=\"vocab\">explicit</span> /ɪkˈsplɪsɪt/ guidelines, and <span class=\"vocab\">manipulate</span> /məˈnɪpjuleɪt/ data to understand urban patterns better.", zh: "一个专属研究设施让科学家能够放大他们的发现，创建明确的指导方针，并操控数据以更好地理解城市模式。"},
+                    { en: "Reaching this <span class=\"vocab\">milestone</span> /ˈmaɪlstəʊn/ was crucial, but the permit would <span class=\"vocab\">expire</span> /ɪkˈspaɪə/ if riverbanks continued to <span class=\"vocab\">erode</span> /ɪˈrəʊd/, threatening the entire project's viability.", zh: "达到这个里程碑至关重要，但如果河岸继续被侵蚀，许可证将到期，威胁整个项目的可行性。"},
+                    { en: "Developers planned to <span class=\"vocab\">flip</span> /flɪp/ abandoned buildings into <span class=\"vocab\">miniature</span> /ˈmɪnɪətʃə/ community centers that captured the <span class=\"vocab\">essence</span> /ˈesns/ of local culture through <span class=\"vocab\">quantitative</span> /ˌkwɒntɪˈteɪtɪv/ analysis of community needs.", zh: "开发商计划将废弃建筑翻新成袖珍社区中心，通过对社区需求的定量分析来捕捉当地文化的精髓。"},
+                    { en: "Teachers would <span class=\"vocab\">impart</span> /ɪmˈpɑːt/ essential skills so no student felt <span class=\"vocab\">inferior</span> /ɪnˈfɪəriə/; when challenges arose, they could <span class=\"vocab\">resort</span> /rɪˈzɔːt/ to an <span class=\"vocab\">infinite</span> /ˈɪnfɪnət/ array of learning resources.", zh: "教师将传授基本技能，让任何学生都不再感到自卑；当挑战出现时，他们可以求助于无限的学习资源。"},
+                    { en: "The community learned to <span class=\"vocab\">shed</span> /ʃed/ old fears, recognizing that there was no <span class=\"vocab\">substitute</span> /ˈsʌbstɪtjuːt/ for collective action in preventing <span class=\"vocab\">suicide</span> /ˈsuːɪsaɪd/ rates from rising, while cattle continued to <span class=\"vocab\">graze</span> /ɡreɪz/ peacefully in nearby fields.", zh: "社区学会了摆脱旧恐惧，认识到在防止自杀率上升方面，集体行动没有替代品，而牛群继续在附近的田野里安静地吃草。"}
+                ]
+            },
+            'u12': {
+                title: "Community Resilience and Recovery",
+                paragraphs: [
+                    { en: "Emergency officials warned that poor nutrition would <span class=\"vocab\">jeopardize</span> /ˈdʒepədaɪz/ public health and undermine the community's <span class=\"vocab\">acceptance</span> /əkˈseptəns/ of necessary measures, so they created a <span class=\"vocab\">legitimate</span> /lɪˈdʒɪtɪmət/ system to <span class=\"vocab\">chase</span> /tʃeɪs/ down every food shortage.", zh: "应急官员警告说，营养不良会危及公共健康并破坏社区对必要措施的接受，因此他们创建了一个合法系统来追查每一次食物短缺。"},
+                    { en: "They monitored every <span class=\"vocab\">carbohydrate</span> /ˌkɑːbəʊˈhaɪdreɪt/ source, helping families <span class=\"vocab\">cling</span> /klɪŋ/ to hope even as <span class=\"vocab\">marginal</span> /ˈmɑːdʒɪnl/ producers experienced a sudden price <span class=\"vocab\">surge</span> /sɜːdʒ/ that threatened stability.", zh: "他们监控每一个碳水化合物来源，帮助家庭抓住希望，即使边缘生产者经历了威胁稳定的突然价格激增。"},
+                    { en: "Through <span class=\"vocab\">verbal</span> /ˈvɜːbl/ instructions that seemed to <span class=\"vocab\">linger</span> /ˈlɪŋɡə/ like <span class=\"vocab\">medieval</span> /ˌmediˈiːvl/ chants, coordinators guided volunteers in the <span class=\"vocab\">midst</span> /mɪdst/ of the crisis.", zh: "通过像中世纪颂歌一样回荡的口头指示，协调员在危机中指导志愿者。"},
+                    { en: "Officials calculated the <span class=\"vocab\">cumulative</span> /ˈkjuːmjələtɪv/ impact of environmental <span class=\"vocab\">destruction</span> /dɪˈstrʌkʃn/, revealing how a <span class=\"vocab\">notorious</span> /nəʊˈtɔːriəs/ corporation had hoarded the <span class=\"vocab\">bulk</span> /bʌlk/ of emergency funds.", zh: "官员们计算了环境破坏的累积影响，揭示了一家臭名昭著的公司如何囤积了大部分应急资金。"},
+                    { en: "Workers received financial aid to <span class=\"vocab\">compensate</span> /ˈkɒmpenseɪt/ for displacement, along with comprehensive <span class=\"vocab\">orientation</span> /ˌɔːriənˈteɪʃn/ covering <span class=\"vocab\">elementary</span> /ˌelɪˈmentri/ safety protocols without <span class=\"vocab\">overstate</span> /ˌəʊvəˈsteɪt/ the challenges they faced.", zh: "工人获得了经济援助以补偿流离失所，以及涵盖基本安全协议的全面入职培训，而没有夸大他们面临的挑战。"},
+                    { en: "While residents might <span class=\"vocab\">moan</span> /məʊn/ about restrictions, everyone understood that clean water was <span class=\"vocab\">indispensable</span> /ˌɪndɪˈspensəbl/ as waterways <span class=\"vocab\">wind</span> /waɪnd/ through the region while laboratories <span class=\"vocab\">evalute</span> /ɪˈvæljuːeɪt/ water quality continuously.", zh: "虽然居民可能会抱怨限制，但每个人都明白，在水道蜿蜒穿过该地区、实验室持续评估水质的情况下，清洁水是不可或缺的。"},
+                    { en: "The goal of <span class=\"vocab\">longevity</span> /lɒnˈdʒevəti/ motivated the <span class=\"vocab\">munnicipal</span> /mjuːˈnɪsɪpl/ government to crack down on merchants who <span class=\"vocab\">oppress</span> /əˈpres/ elderly citizens with hidden <span class=\"vocab\">liability</span> /ˌlaɪəˈbɪləti/ terms in contracts.", zh: "长寿的目标促使市政府打击那些在合同中使用隐藏责任条款压迫老年公民的商人。"},
+                    { en: "Security teams <span class=\"vocab\">patrol</span> /pəˈtrəʊl/ critical areas in <span class=\"vocab\">robust</span> /rəʊˈbʌst/ vehicles whose searchlights <span class=\"vocab\">dazzle</span> /ˈdæzl/ anyone approaching the coastal <span class=\"vocab\">peninsula</span> /pəˈnɪnsjələ/ at night.", zh: "安全团队在坚固的车辆中巡逻关键区域，其探照灯在夜间让任何接近沿海半岛的人都感到炫目。"},
+                    { en: "Urban planners <span class=\"vocab\">designate</span> /ˈdezɪɡneɪt/ rooftop gardens for <span class=\"vocab\">subsistence</span> /səbˈsɪstəns/ farming to prevent families from <span class=\"vocab\">panic</span> /ˈpænɪk/ about nutritional deficiencies like <span class=\"vocab\">calcium</span> /ˈkælsiəm/ shortages.", zh: "城市规划者指定屋顶花园用于自给农业，以防止家庭因钙缺乏等营养不足而恐慌。"},
+                    { en: "Emergency alerts could <span class=\"vocab\">provoke</span> /prəˈvəʊk/ heated discussions about <span class=\"vocab\">respective</span> /rɪˈspektɪv/ responsibilities, but training exercises that <span class=\"vocab\">saturate</span> /ˈsætʃəreɪt/ public spaces help keep citizens less <span class=\"vocab\">susceptible</span> /səˈseptəbl/ to misinformation.", zh: "紧急警报可能引发关于各自责任的激烈讨论，但使公共空间饱和的训练演习有助于让公民不那么容易受到错误信息的影响。"},
+                    { en: "Authorities refused to <span class=\"vocab\">tame</span> /teɪm/ their warnings into a <span class=\"vocab\">geniune</span> /ˈdʒenjuɪn/ reassurance; instead, they <span class=\"vocab\">exert</span> /ɪɡˈzɜːt/ measured pressure about the <span class=\"vocab\">grave</span> /ɡreɪv/ situation, even when administrative tasks become <span class=\"vocab\">tedious</span> /ˈtiːdiəs/.", zh: "当局拒绝将他们的警告驯化成真正的安慰；相反，即使行政任务变得乏味，他们也会对严峻的局势施加有分寸的压力。"}
+                ]
+            },
+            'u13': {
+                title: "Innovation and Enterprise",
+                paragraphs: [
+                    { en: "The marketplace started as an <span class=\"vocab\">imitation</span> /ˌɪmɪˈteɪʃn/ of traditional shops, offering low-<span class=\"vocab\">cholesterol</span> /kəˈlestərɒl/ options while delivery drones <span class=\"vocab\">hover</span> /ˈhʌvə/ overhead like a watchful <span class=\"vocab\">jury</span> /ˈdʒʊəri/ monitoring operations.", zh: "市场开始时是对传统商店的模仿，提供低胆固醇选择，而送货无人机像监视运营的陪审团一样在头顶盘旋。"},
+                    { en: "An <span class=\"vocab\">aggressive</span> /əˈɡresɪv/ tech company integrated recycled <span class=\"vocab\">silicon</span> /ˈsɪlɪkən/ into lighting systems that no longer produced <span class=\"vocab\">dim</span> /dɪm/ illumination during the research <span class=\"vocab\">expedition</span> /ˌekspəˈdɪʃn/ to remote areas.", zh: "一家激进的科技公司将回收硅集成到照明系统中，在前往偏远地区的研究考察期间不再产生昏暗的照明。"},
+                    { en: "The team proposed a <span class=\"vocab\">desirable</span> /dɪˈzaɪərəbl/ financing model that ensured debt <span class=\"vocab\">satisfaction</span> /ˌsætɪsˈfækʃn/ and would <span class=\"vocab\">entitle</span> /ɪnˈtaɪtl/ local craftspeople to invest with renewed <span class=\"vocab\">faith</span> /feɪθ/ in the economy.", zh: "团队提出了一个令人向往的融资模式，确保债务清偿，并让当地手工艺人有资格以对经济的新信心进行投资。"},
+                    { en: "Researchers combined <span class=\"vocab\">empirical</span> /ɪmˈpɪrɪkl/ evidence with creative <span class=\"vocab\">satire</span> /ˈsætaɪə/ in their presentations; <span class=\"vocab\">nonetheless</span> /ˌnʌnðəˈles/, they fully embraced the <span class=\"vocab\">paradox</span> /ˈpærədɒks/ of balancing innovation with tradition.", zh: "研究人员在演示中将经验证据与创造性讽刺相结合；尽管如此，他们完全拥抱了平衡创新与传统的悖论。"},
+                    { en: "When transport systems <span class=\"vocab\">strand</span> /strænd/ passengers, operators must obtain <span class=\"vocab\">consent</span> /kənˈsent/ to arrange alternative services, preventing any company from reestablishing a <span class=\"vocab\">monopoly</span> /məˈnɒpəli/ through <span class=\"vocab\">crude</span> /kruːd/ business practices.", zh: "当运输系统使乘客滞留时，运营商必须获得同意来安排替代服务，防止任何公司通过粗鲁的商业做法重新建立垄断。"},
+                    { en: "Merchants maintained narrow profit <span class=\"vocab\">margin</span> /ˈmɑːdʒɪn/ and informed customers <span class=\"vocab\">beforehand</span> /bɪˈfɔːhænd/ that they might <span class=\"vocab\">convert</span> /kənˈvɜːt/ storage areas into medical facilities if another system <span class=\"vocab\">breakdown</span> /ˈbreɪkdaʊn/ occurred.", zh: "商人保持狭窄的利润空间，并事先告知客户，如果再次发生系统故障，他们可能会将存储区改造成医疗设施。"},
+                    { en: "Educators mentor <span class=\"vocab\">prospective</span> /prəˈspektɪv/ entrepreneurs to draw <span class=\"vocab\">inspiration</span> /ˌɪnspəˈreɪʃn/ from urban art, calculating dimensions <span class=\"vocab\">precisely</span> /prɪˈsaɪsli/ to reduce the <span class=\"vocab\">incidence</span> /ˈɪnsɪdəns/ of material waste.", zh: "教育者指导准企业家从城市艺术中汲取灵感，精确计算尺寸以减少材料浪费的发生率。"},
+                    { en: "Local financial institutions <span class=\"vocab\">bolster</span> /ˈbəʊlstə/ lending programs and clarify the <span class=\"vocab\">implication</span> /ˌɪmplɪˈkeɪʃn/ of each credit <span class=\"vocab\">handicap</span> /ˈhændɪkæp/ rating to ensure developers never <span class=\"vocab\">segregate</span> /ˈseɡrɪɡeɪt/ potential clients unfairly.", zh: "当地金融机构支持贷款计划，并澄清每个信用障碍评级的含义，以确保开发商不会不公平地排斥潜在客户。"},
+                    { en: "Following a financial <span class=\"vocab\">setback</span> /ˈsetbæk/, the organization depended on <span class=\"vocab\">sheer</span> /ʃɪə/ transparency to uncover a <span class=\"vocab\">fraud</span> /frɔːd/ operation and <span class=\"vocab\">combat</span> /ˈkɒmbæt/ growing pessimism.", zh: "在财务挫折之后，该组织依靠纯粹的透明度来揭露欺诈行为并对抗日益增长的悲观情绪。"},
+                    { en: "Even during slow periods when demand would <span class=\"vocab\">slack</span> /slæk/, their creative <span class=\"vocab\">ingenuity</span> /ˌɪndʒəˈnjuːəti/ enabled them to <span class=\"vocab\">presumably</span> /prɪˈzjuːməbli/ <span class=\"vocab\">triple</span> /ˈtrɪpl/ production capacity for seasonal markets.", zh: "即使在需求会放缓的淡季，他们的创造性巧思使他们能够推测性地将生产能力提高三倍以应对季节性市场。"},
+                    { en: "They confront outdated <span class=\"vocab\">bureaucracy</span> /bjʊəˈrɒkrəsi/ by organizing a design <span class=\"vocab\">contest</span> /ˈkɒntest/ where responsible business <span class=\"vocab\">turnover</span> /ˈtɜːnəʊvə/ rates rival those in cities of <span class=\"vocab\">comparable</span> /ˈkɒmpərəbl/ size.", zh: "他们通过组织设计竞赛来对抗过时的官僚主义，其中负责任的业务周转率可与同等规模城市的相媲美。"}
+                ]
+            },
+            'u14': {
+                title: "Coastal Resilience and Renewal",
+                paragraphs: [
+                    { en: "The research facility offered a modest <span class=\"vocab\">bouns</span> /ˈbəʊnəs/ to <span class=\"vocab\">verify</span> /ˈverɪfaɪ/ which coastal defenses could prevent <span class=\"vocab\">catastrophe</span> /kəˈtæstrəfi/ while remaining economically <span class=\"vocab\">viable</span> /ˈvaɪəbl/ for long-term use.", zh: "研究设施提供了一笔适度的奖金来验证哪些海岸防御措施既能防止灾难，又能在长期使用中保持经济可行性。"},
+                    { en: "Scientists constructed a testing <span class=\"vocab\">chamber</span> /ˈtʃeɪmbə/ where artwork <span class=\"vocab\">transcend</span> /trænˈsend/ ordinary design, allowing local children to enjoy <span class=\"vocab\">cricket</span> /ˈkrɪkɪt/ matches in a <span class=\"vocab\">vigorous</span> /ˈvɪɡərəs/ and healthy environment.", zh: "科学家建造了一个测试室，其中的艺术品超越了普通设计，让当地儿童在充满活力和健康的环境中享受板球比赛。"},
+                    { en: "They redirected the emergency <span class=\"vocab\">cable</span> /ˈkeɪbl/ network to maintain <span class=\"vocab\">agreeable</span> /əˈɡriːəbl/ public spaces, even as rumors about economic hardship and a tourism <span class=\"vocab\">plague</span> /pleɪɡ/ spread, leaving many with empty <span class=\"vocab\">belly</span> /ˈbeli/ concerns.", zh: "他们重新定向应急电缆网络以维护令人愉悦的公共空间，即使关于经济困难和旅游业疫病的谣言传播，让许多人担心饥饿。"},
+                    { en: "City planners suggested a <span class=\"vocab\">plausible</span> /ˈplɔːzəbl/ <span class=\"vocab\">aviation</span> /ˌeɪviˈeɪʃn/ delivery system to <span class=\"vocab\">conserve</span> /kənˈsɜːv/ medical supplies, using drones to transport each <span class=\"vocab\">prescription</span> /prɪˈskrɪpʃn/ directly to patients.", zh: "城市规划者提出了一个可信的航空配送系统来保护医疗用品，使用无人机将每个处方直接运送给患者。"},
+                    { en: "An old <span class=\"vocab\">colonial</span> /kəˈləʊniəl/ warehouse now serves as a hub for shared <span class=\"vocab\">appliance</span> /əˈplaɪəns/ services; residents <span class=\"vocab\">aggregate</span> /ˈæɡrɪɡeɪt/ their needs and <span class=\"vocab\">proclaim</span> /prəˈkleɪm/ their commitment to sustainable energy.", zh: "一个旧的殖民仓库现在作为共享家电服务的中心；居民汇总他们的需求并宣告他们对可持续能源的承诺。"},
+                    { en: "Even if financial institutions <span class=\"vocab\">default</span> /dɪˈfɔːlt/ on their commitments, families can still access <span class=\"vocab\">spacious</span> /ˈspeɪʃəs/ housing where community groups <span class=\"vocab\">dictate</span> /dɪkˈteɪt/ fair policies across the entire <span class=\"vocab\">span</span> /spæn/ of the region.", zh: "即使金融机构违约，家庭仍然可以进入宽敞的住房，社区团体在整个地区范围内规定公平政策。"},
+                    { en: "Creative professionals challenge the <span class=\"vocab\">dominant</span> /ˈdɒmɪnənt/ assumption that reconstruction has a fixed <span class=\"vocab\">threshold</span> /ˈθreʃhəʊld/; instead, they <span class=\"vocab\">speculate</span> /ˈspekjuleɪt/ through collaborative <span class=\"vocab\">engagement</span> /ɪnˈɡeɪdʒmənt/ workshops.", zh: "创意专业人士挑战重建有固定门槛的主导假设；相反，他们通过协作参与研讨会进行推测。"},
+                    { en: "Every sustainable technology <span class=\"vocab\">venture</span> /ˈventʃə/ strives to <span class=\"vocab\">exceed</span> /ɪkˈsiːd/ performance goals by establishing <span class=\"vocab\">extensive</span> /ɪkˈstensɪv/ networks of bicycle <span class=\"vocab\">ferry</span> /ˈferi/ terminals.", zh: "每个可持续技术企业都努力通过建立广泛的自行车渡轮终端网络来超越性能目标。"},
+                    { en: "Horticulturists refuse to let saltwater intrusion <span class=\"vocab\">spoil</span> /spɔɪl/ their <span class=\"vocab\">neutral</span> /ˈnjuːtrəl/ soil systems, even when administrators in the <span class=\"vocab\">hierarchy</span> /haɪˈrɑːki/ <span class=\"vocab\">deem</span> /diːm/ their methods unconventional.", zh: "园艺师拒绝让盐水入侵破坏他们的中性土壤系统，即使等级制度中的管理者认为他们的方法非常规。"},
+                    { en: "They educate every <span class=\"vocab\">offspring</span> /ˈɒfsprɪŋ/ to understand <span class=\"vocab\">fiscal</span> /ˈfɪskl/ planning so that unscrupulous investors cannot <span class=\"vocab\">sneak</span> /sniːk/ in with <span class=\"vocab\">evil</span> /ˈiːvl/ schemes.", zh: "他们教育每个后代理解财政规划，以便不道德的投资者无法带着邪恶的计划偷偷进入。"},
+                    { en: "Healthcare workers monitor public <span class=\"vocab\">hygiene</span> /haɪˈdʒiːn/ standards and <span class=\"vocab\">testify</span> /ˈtestɪfaɪ/ at public hearings whenever a <span class=\"vocab\">tragic</span> /ˈtrædʒɪk/ natural disaster threatens to <span class=\"vocab\">unleash</span> /ʌnˈliːʃ/ widespread suffering.", zh: "医护人员监控公共卫生标准，并在每当悲惨的自然灾害威胁要释放广泛痛苦时在公开听证会上作证。"},
+                    { en: "They pledge never to <span class=\"vocab\">violate</span> /ˈvaɪəleɪt/ protected wetlands again, instead designing upstream filtration systems that transform each storm event into an opportunity for celebration.", zh: "他们承诺不再违反受保护的湿地，而是设计上游过滤系统，将每场风暴事件转化为庆祝的机会。"}
+                ]
+            },
+            'u15': {
+                title: "Glamour and Turmoil: A Profound Choice",
+                paragraphs: [
+                    { en: 'At first, the city chased <span class="vocab">glamour</span> /ˈɡlæmə/ and an <span class="vocab">imperial</span> /ɪmˈpɪəriəl/ image, trying to <span class="vocab">band</span> /bænd/ districts by status to impress investors.', zh: '一开始，这座城市追逐魅力与帝国气象，试图按身份给城区划分档次以打动投资者。' },
+                    { en: 'But a <span class="vocab">turbulent</span> /ˈtɜːbjʊlənt/ market forced a <span class="vocab">compromise</span> /ˈkɒmprəmaɪz/, and social <span class="vocab">turmoil</span> /ˈtɜːmɔɪl/ soon followed.', zh: '然而动荡的市场迫使人们妥协，社会动乱接踵而至。' },
+                    { en: 'Leaders searched for methods <span class="vocab">conducive</span> /kənˈdjuːsɪv/ to stability: new skills, more transparent <span class="vocab">diploma</span> /dɪˈpləʊmə/ pathways, and programs that truly <span class="vocab">utilize</span> /ˈjuːtɪlaɪz/ local talent.', zh: '领导者寻找有利于稳定的方法：新技能、更透明的文凭路径，以及真正利用本地人才的项目。' },
+                    { en: 'Some promoted a green <span class="vocab">ideology</span> /ˌaɪdiˈɒlədʒi/ with help from a generous <span class="vocab">patron</span> /ˈpeɪtrən/, while others planned to <span class="vocab">submerge</span> /səbˈmɜːdʒ/ the slums under riverside parks.', zh: '有人在慷慨资助者的帮助下推广绿色意识形态，另一些人则计划把棚户区“淹没”在滨河公园之下。' },
+                    { en: 'Architects honored <span class="vocab">indigenous</span> /ɪnˈdɪdʒənəs/ wisdom to <span class="vocab">complement</span> /ˈkɒmplɪment/ modern designs and reduce urban <span class="vocab">disorder</span> /dɪsˈɔːdə/.', zh: '建筑师尊重本土智慧来补充现代设计，从而减少城市无序。' },
+                    { en: 'Businesses vowed to <span class="vocab">comply</span> /kəmˈplaɪ/ with fair hiring, championed by a bold <span class="vocab">feminist</span> /ˈfemənɪst/ who demanded <span class="vocab">compulsory</span> /kəmˈpʌlsəri/ equal-pay audits.', zh: '企业承诺遵守公平招聘，一位勇敢的女权主义者倡导强制性的同酬审计。' },
+                    { en: 'Farmers reduced <span class="vocab">pesticide</span> /ˈpestɪsaɪd/ use, while clinics coped with a <span class="vocab">hectic</span> /ˈhektɪk/ schedule as health services began to <span class="vocab">converge</span> /kənˈvɜːdʒ/ in underserved areas.', zh: '农民减少了农药使用，而随着医疗服务在服务不足地区汇聚，诊所应对着繁忙的日程。' },
+                    { en: 'The council faced a funding <span class="vocab">dilemma</span> /dɪˈlemə/: should emergency <span class="vocab">provision</span> /prəˈvɪʒn/ be expanded, or should they <span class="vocab">disclose</span> /dɪsˈkləʊz/ cuts now?', zh: '议会面临资金困境：该扩大紧急供给，还是现在就公开削减？' },
+                    { en: 'Corruption was <span class="vocab">prevalent</span> /ˈprevələnt/ in waste contracts; officials vowed to treat <span class="vocab">junk</span> /dʒʌŋk/ honestly, not to <span class="vocab">devastate</span> /ˈdevəsteɪt/ the budget with hidden fees.', zh: '在垃圾处理合同中腐败盛行；官员们发誓要如实处理废弃物，不能让隐藏费用摧毁预算。' },
+                    { en: 'Old <span class="vocab">primitive</span> /ˈprɪmətɪv/ systems were replaced; wrongful fines got a swift <span class="vocab">refund</span> /ˈriːfʌnd/, letting honest taxpayers finally <span class="vocab">reap</span> /riːp/ trust dividends.', zh: '陈旧落后的系统被替换；错误罚款迅速退款，诚信纳税人终于收获信任红利。' },
+                    { en: 'In the southern <span class="vocab">hemisphere</span> /ˈhemɪsfɪə/, parallel cities passed landmark <span class="vocab">legislation</span> /ˌledʒɪsˈleɪʃn/ after a housing <span class="vocab">bust</span> /bʌst/.', zh: '在南半球，平行城市在房地产崩盘后通过了里程碑式立法。' },
+                    { en: 'A leaked <span class="vocab">manuscript</span> /ˈmænjuˌskrɪpt/ revealed the plan: aid was targeted to the true <span class="vocab">recipient</span> /rɪˈsɪpiənt/, while officials who tried to <span class="vocab">mask</span> /mɑːsk/ bribes were exposed.', zh: '一份泄露的手稿揭示了方案：援助精准投向真正的受益者，而试图伪装行贿的官员被揭露。' },
+                    { en: 'Public health became more <span class="vocab">immune</span> /ɪˈmjuːn/ to shocks as <span class="vocab">optimism</span> /ˈɒptɪmɪzəm/ spread and community voices <span class="vocab">amplify</span> /ˈæmplɪfaɪ/ through open forums.', zh: '随着乐观情绪扩散、社区声音在开放论坛中得到放大，公共卫生对冲击的免疫力增强。' },
+                    { en: 'Economic <span class="vocab">reliance</span> /rɪˈlaɪəns/ on a single export began to <span class="vocab">decay</span> /dɪˈkeɪ/ after a joint <span class="vocab">pledge</span> /pledʒ/ to diversify investment.', zh: '在共同承诺多元化投资后，对单一出口的经济依赖开始衰退。' },
+                    { en: 'Citizens reached a <span class="vocab">profound</span> /prəˈfaʊnd/ conclusion: never again let shiny promises <span class="vocab">deceive</span> /dɪˈsiːv/ us about real costs.', zh: '市民得出深刻结论：绝不再让光鲜承诺欺骗我们对真实成本的判断。' },
+                    { en: 'Even a weary <span class="vocab">psychiatrist</span> /saɪˈkaɪətrɪst/ joked that stress became <span class="vocab">redundant</span> /rɪˈdʌndənt/ once people felt heard and policies turned humane.', zh: '甚至一位疲惫的精神科医生也打趣说：当人们被倾听、政策变得人性化，压力就显得多余了。' }
+                ]
+            },
+            'u16': {
+                title: "Refuge and Reform: A Civic Relay",
+                paragraphs: [
+                    { en: 'After the flood, families sought <span class="vocab">refuge</span> /ˈrefjuːdʒ/ in schools, where a <span class="vocab">substantial</span> /səbˈstænʃl/ aid <span class="vocab">transaction</span> /trænˈzækʃn/ demanded <span class="vocab">deliberate</span> /dɪˈlɪbərət/ oversight.', zh: '洪水过后，家庭在学校寻求庇护，大额援助交易需要审慎监管。' },
+                    { en: 'Witness <span class="vocab">testimony</span> /ˈtestɪməni/ described an <span class="vocab">unprecedented</span> /ʌnˈpresɪdentɪd/ effort to <span class="vocab">discard</span> /dɪˈskɑːd/ red tape on the <span class="vocab">verge</span> /vɜːdʒ/ of a new <span class="vocab">civic</span> /ˈsɪvɪk/ compact.', zh: '证词描述了一场前所未有的努力，在新的市民契约边缘抛弃繁文缛节。' },
+                    { en: 'Volunteers learned to <span class="vocab">discern</span> /dɪˈsɜːn/ needs and match <span class="vocab">equivalent</span> /ɪˈkwɪvələnt/ support, avoiding the neglect of any <span class="vocab">slum</span> /slʌm/ community.', zh: '志愿者学会分辨需求、配对等量支持，避免忽视任何棚户区社区。' },
+                    { en: 'When supply trucks <span class="vocab">collide</span> /kəˈlaɪd/ with bottlenecks, neighborhood <span class="vocab">solidarity</span> /ˌsɒlɪˈdærəti/ bridged <span class="vocab">ethnic</span> /ˈeθnɪk/ lines in <span class="vocab">spite</span> /spaɪt/ of rumor and fear.', zh: '当物资车与瓶颈相撞，邻里团结跨越族群界限，尽管有流言与恐惧。' },
+                    { en: 'Temporary <span class="vocab">settlement</span> /ˈsetlmənt/ zones screened out <span class="vocab">toxic</span> /ˈtɒksɪk/ waste; each center had a medical <span class="vocab">specialty</span> /ˈspeʃəlti/ desk to <span class="vocab">relay</span> /rɪˈleɪ/ cases.', zh: '临时安置区排查有毒废物；每个中心都有专科窗口转呈个案。' },
+                    { en: 'A modest <span class="vocab">subsidy</span> /ˈsʌbsɪdi/ covered <span class="vocab">casual</span> /ˈkæʒuəl/ labor, while engineers mapped a <span class="vocab">skeleton</span> /ˈskelɪtn/ route to <span class="vocab">bypass</span> /ˈbaɪpɑːs/ blocked bridges.', zh: '一笔小额补贴覆盖临时劳工，工程师绘制骨干路线以绕过被堵桥梁。' },
+                    { en: 'Though <span class="vocab">conservative</span> /kənˈsɜːvətɪv/ forecasts warned of decline in each <span class="vocab">segment</span> /ˈseɡmənt/, leaders kept a tight <span class="vocab">rein</span> /reɪn/ on waste and made relief <span class="vocab">conspicuous</span> /kənˈspɪkjʊəs/.', zh: '尽管保守预测警告各板块下滑，领导层严格约束浪费，使救助显眼可见。' },
+                    { en: 'Debates over <span class="vocab">territory</span> /ˈterɪtɔːri/ cooled as youths <span class="vocab">aspire</span> /əˈspaɪə/ to share their <span class="vocab">aspiration</span> /ˌæspəˈreɪʃn/ for work, not a <span class="vocab">flat</span> /flæt/ future.', zh: '关于地盘的争论逐渐降温，青年渴望分享对工作的抱负，而不是枯燥的未来。' },
+                    { en: 'An <span class="vocab">extraordinary</span> /ɪkˈstrɔːrdəneri/ council <span class="vocab">formulate</span>d /ˈfɔːmjuleɪt/ safeguards after a rise in <span class="vocab">theft</span> /θeft/ across the reopened <span class="vocab">pasture</span> /ˈpɑːstʃə/ roads.', zh: '非常会议在重开牧道后盗窃上升之际制定了保障措施。' },
+                    { en: 'Their <span class="vocab">ingenious</span> /ɪnˈdʒiːniəs/ plan used sensors to <span class="vocab">probe</span> /prəʊb/ flows and penalize the <span class="vocab">slight</span> /slaɪt/ of vulnerable groups.', zh: '他们的巧妙方案用传感器探测流量，并惩戒对弱势群体的冷落。' },
+                    { en: 'They upheld the <span class="vocab">virtue</span> /ˈvɜːtʃuː/ of transparency to <span class="vocab">signify</span> /ˈsɪɡnɪfaɪ/ a <span class="vocab">prominent</span> /ˈprɒmɪnənt/ shift: aid in cash or <span class="vocab">garment</span> /ˈɡɑːmənt/ vouchers, easy to <span class="vocab">retrieve</span> /rɪˈtriːv/.', zh: '他们坚持透明之德，以示重大转变：援助以现金或服装券发放，便于领取。' },
+                    { en: 'The final <span class="vocab">proposition</span> /ˌprɒpəˈzɪʃn/ held agencies <span class="vocab">liable</span> /ˈlaɪəbl/ for delays, while volunteers guided lines down each <span class="vocab">aisle</span> /aɪl/ with patience and care.', zh: '最终提案让机构对延误承担责任，志愿者耐心引导队伍穿过每条通道。' }
+                ]
+            },
+            'u17': {
+                title: "The City's Transformation",
+                paragraphs: [
+                    { en: 'The city council needed to <span class="vocab">recruit</span> /rɪˈkruːt/ a new urban planning <span class="vocab">practitioner</span> /prækˈtɪʃənə/, someone who would be an <span class="vocab">asset</span> /ˈæset/ (有价值的人) to the team.', zh: '市议会需要招募一位新的城市规划从业者，一个对团队来说有价值的人。' },
+                    { en: 'The position required someone with a <span class="vocab">liberal</span> /ˈlɪbərəl/ mindset and the ability to <span class="vocab">visualize</span> /ˈvɪʒuəlaɪz/ the future of <span class="vocab">residential</span> /ˌrezɪˈdenʃl/ areas.', zh: '该职位需要一个具有自由思想和能够想象住宅区未来的人。' },
+                    { en: 'As the interview process began to <span class="vocab">unfold</span> /ʌnˈfəʊld/ (透露), one candidate stood out with her <span class="vocab">thesis</span> /ˈθiːsɪs/ on sustainable development.', zh: '随着面试过程透露，一位候选人以她关于可持续发展的论文脱颖而出。' },
+                    { en: 'She could <span class="vocab">quote</span> /kwəʊt/ from multiple urban <span class="vocab">masterpiece</span>s /ˈmɑːstəpiːsɪz/ and had a <span class="vocab">magnetic</span> /mæɡˈnetɪk/ (富有吸引力的) presence that impressed everyone.', zh: '她能引用多部城市规划杰作，并具有富有吸引力的气质，给每个人留下了深刻印象。' },
+                    { en: 'The city faced an <span class="vocab">imperative</span> /ɪmˈperətɪv/ challenge: its aging infrastructure had a critical <span class="vocab">flaw</span> /flɔː/ that was <span class="vocab">inevitable</span> /ɪnˈevɪtəbl/ to address.', zh: '这座城市面临一个紧迫的挑战：其老化的基础设施有一个不可避免要解决的关键缺陷。' },
+                    { en: 'The old <span class="vocab">warehouse</span> /ˈweəhaʊs/ district, once a <span class="vocab">fixture</span> /ˈfɪkstʃə/ of industrial life, had become a <span class="vocab">relic</span> /ˈrelɪk/ of the past.', zh: '旧仓库区，曾经是工业生活的固定设施，已经成为过去的遗迹。' },
+                    { en: 'Property values would <span class="vocab">fluctuate</span> /ˈflʌktʃueɪt/ wildly, and the <span class="vocab">scope</span> /skəʊp/ of problems seemed to <span class="vocab">loom</span> /luːm/ larger each day.', zh: '房产价值会剧烈波动，问题的范围似乎每天都在逼近得更大。' },
+                    { en: 'The planning team needed to <span class="vocab">compose</span> /kəmˈpəʊz/ (使平静) themselves before tackling the <span class="vocab">deficiency</span> /dɪˈfɪʃnsi/ in public services that would <span class="vocab">swamp</span> /swɒmp/ (使不堪承受) any new development.', zh: '规划团队需要使自己平静下来，然后解决会使任何新开发不堪承受的公共服务不足问题。' },
+                    { en: 'Through her <span class="vocab">lens</span> /lenz/ of analysis, she could <span class="vocab">quantify</span> /ˈkwɒntɪfaɪ/ the costs and <span class="vocab">simulate</span> /ˈsɪmjuleɪt/ various scenarios.', zh: '通过她的分析视角，她可以量化成本并模拟各种情景。' },
+                    { en: 'She was <span class="vocab">vocal</span> /ˈvəʊkl/ (直言不讳的) about the need for <span class="vocab">equity</span> /ˈekwəti/ in resource <span class="vocab">disposal</span> /dɪˈspəʊzl/, ensuring no community would be left behind.', zh: '她直言不讳地指出在资源分配中需要公平，确保没有社区被遗忘。' },
+                    { en: 'The legal <span class="vocab">counsel</span> /ˈkaʊnsl/ warned that any plan must not <span class="vocab">contradict</span> /ˌkɒntrəˈdɪkt/ existing regulations or risk a <span class="vocab">lawsuit</span> /ˈlɔːsuːt/.', zh: '法律顾问警告说，任何计划都不得与现行法规相矛盾，否则会有诉讼风险。' },
+                    { en: 'The proposal needed to be <span class="vocab">feasible</span> /ˈfiːzəbl/ both financially and logistically, with a <span class="vocab">compact</span> /ˈkɒmpækt/ (协定；紧凑的) design that maximized space efficiency.', zh: '该提案在财务和后勤上都需要可行，设计要紧凑以最大化空间效率。' },
+                    { en: 'The area had attracted many <span class="vocab">migrant</span>s /ˈmaɪɡrənt/ and their <span class="vocab">descendant</span>s /dɪˈsendənt/, all seeking to <span class="vocab">orient</span> /ˈɔːriənt/ themselves in this new environment.', zh: '该地区吸引了许多移民及其后代，他们都在寻求在这个新环境中确定方向。' },
+                    { en: 'Crime had taken a <span class="vocab">toll</span> /təʊl/ on the community, with reports of <span class="vocab">kidnap</span> /ˈkɪdnæp/ cases and <span class="vocab">cocaine</span> /kəʊˈkeɪn/ trafficking representing the worst forms of <span class="vocab">vice</span> /vaɪs/ (恶行).', zh: '犯罪对社区造成了损失，绑架案件和可卡因贩运报告代表了最严重形式的恶行。' },
+                    { en: 'The community\'s trust had begun to <span class="vocab">wither</span> /ˈwɪðə/, and hopes seemed to <span class="vocab">evaporate</span> /ɪˈvæpəreɪt/ with each <span class="vocab">successive</span> /səkˈsesɪv/ failure.', zh: '社区的信任已经开始枯萎，希望似乎随着每一次连续的失败而蒸发。' },
+                    { en: 'But she remained <span class="vocab">relentless</span> /rɪˈlentləs/ in her efforts, <span class="vocab">resistant</span> /rɪˈzɪstənt/ to any pressure to compromise her vision.', zh: '但她在努力中保持不懈，抵制任何妥协她愿景的压力。' },
+                    { en: 'Her plan was not just <span class="vocab">manual</span> /ˈmænjuəl/ (手动的) adjustments to existing structures, but a complete transformation.', zh: '她的计划不仅仅是对现有结构的手动调整，而是一次彻底的转变。' },
+                    { en: 'She proposed a <span class="vocab">remedy</span> /ˈremədi/ that included creating a <span class="vocab">surplus</span> /ˈsɜːpləs/ of green spaces and improving the <span class="vocab">commute</span> /kəˈmjuːt/ for residents.', zh: '她提出了一个补救措施，包括创造绿地盈余和改善居民的通勤。' },
+                    { en: 'Her vision transformed the district into a model community, proving that with determination and careful planning, urban renewal is always possible.', zh: '她的愿景将该地区转变为一个模范社区，证明了有决心和精心规划，城市更新总是可能的。' }
+                ]
+            },
+            'u18': {
+                title: "A Journey Through Crisis and Reform",
+                paragraphs: [
+                    { en: 'At the <span class="vocab">outset</span> /ˈaʊtset/ of the economic crisis, a <span class="vocab">coalition</span> /ˌkəʊəˈlɪʃn/ government was formed to address the growing problems.', zh: '在危机开始时，一个联合政府成立来解决日益严重的问题。' },
+                    { en: 'The <span class="vocab">monetary</span> /ˈmʌnɪtəri/ system had become <span class="vocab">contaminated</span> /kənˈtæmɪneɪtɪd/ by corruption, and the nation\'s financial <span class="vocab">integrity</span> /ɪnˈteɡrəti/ was at stake.', zh: '货币体系已被腐败污染，国家的金融诚信岌岌可危。' },
+                    { en: 'From a practical <span class="vocab">standpoint</span> /ˈstændpɔɪnt/, the government needed to <span class="vocab">diagnose</span> /ˌdaɪəɡˈnəʊz/ the root causes and <span class="vocab">strive</span> /straɪv/ for solutions.', zh: '从实际立场来看，政府需要诊断根本原因并努力寻求解决方案。' },
+                    { en: 'The <span class="vocab">parameters</span> /pəˈræmɪtəz/ of the reform were set within a strict <span class="vocab">format</span> /ˈfɔːmæt/, with detailed <span class="vocab">specifications</span> /ˌspesɪfɪˈkeɪʃnz/ that would <span class="vocab">curb</span> /kɜːb/ excessive spending.', zh: '改革的参数被设定在严格的框架内，有详细的规范来抑制过度支出。' },
+                    { en: 'The <span class="vocab">draft</span> /drɑːft/ plan, though <span class="vocab">mechanical</span> /məˈkænɪkl/ and rigid at first, aimed to <span class="vocab">alleviate</span> /əˈliːvieɪt/ the suffering of citizens who had to <span class="vocab">incur</span> /ɪnˈkɜː/ heavy debts.', zh: '这份零散的计划，虽然起初呆板僵化，但旨在减轻那些不得不承担沉重债务的公民的痛苦。' },
+                    { en: 'Many <span class="vocab">skeptical</span> /ˈskeptɪkl/ voices emerged, showing <span class="vocab">contempt</span> /kənˈtempt/ for what they saw as superficial measures that would only <span class="vocab">aggravate</span> /ˈæɡrəveɪt/ the situation.', zh: '许多怀疑的声音出现了，对他们认为只会加剧局势的表面措施表示蔑视。' },
+                    { en: 'The <span class="vocab">stigma</span> /ˈstɪɡmə/ of poverty had begun to <span class="vocab">intensify</span> /ɪnˈtensɪfaɪ/, creating a <span class="vocab">multitude</span> /ˈmʌltɪtjuːd/ of social problems across every <span class="vocab">lane</span> /leɪn/ and neighborhood.', zh: '贫困的耻辱已经开始加剧，在每条街道和社区制造了大量社会问题。' },
+                    { en: 'However, a <span class="vocab">sensible</span> /ˈsensəbl/ approach began to <span class="vocab">prevail</span> /prɪˈveɪl/ through <span class="vocab">mutual</span> /ˈmjuːtʃuəl/ cooperation and public <span class="vocab">discourse</span> /ˈdɪskɔːs/.', zh: '然而，一种明智的方法开始通过相互合作和公共讨论占上风。' },
+                    { en: 'The government decided to <span class="vocab">adhere</span> /ədˈhɪə/ to principles that would not <span class="vocab">discriminate</span> /dɪˈskrɪmɪneɪt/ against any group and would maintain the <span class="vocab">prestige</span> /preˈstiːʒ/ of fair governance.', zh: '政府决定坚持不歧视任何群体的原则，并保持公平治理的声望。' },
+                    { en: 'They issued <span class="vocab">coupons</span> /ˈkuːpɒnz/ for basic necessities and invested in <span class="vocab">vocational</span> /vəʊˈkeɪʃənl/ training programs to help people secure <span class="vocab">stable</span> /ˈsteɪbl/ employment, not just jobs in <span class="vocab">stables</span> /ˈsteɪblz/ (马厩) but in modern industries.', zh: '他们发放基本必需品的优惠券，投资于职业培训项目，帮助人们获得稳定的就业，不仅仅是马厩里的工作，而是现代产业中的工作。' },
+                    { en: 'The <span class="vocab">logistics</span> /ləˈdʒɪstɪks/ of implementing these programs across the entire <span class="vocab">grid</span> /ɡrɪd/ of cities proved to be an <span class="vocab">ordeal</span> /ɔːˈdiːl/.', zh: '在整个城市网络中实施这些项目的后勤工作被证明是一种严峻考验。' },
+                    { en: 'Critics tried to <span class="vocab">stump</span> /stʌmp/ officials with difficult questions and <span class="vocab">distort</span> /dɪˈstɔːt/ the facts, but they continued to <span class="vocab">wrestle</span> /ˈresl/ with (努力解决) the challenges.', zh: '批评者试图用难题难倒官员并歪曲事实，但他们继续努力解决这些挑战。' },
+                    { en: 'The <span class="vocab">inherent</span> /ɪnˈhɪərənt/ complexity of the crisis could <span class="vocab">tempt</span> /tempt/ (诱惑) many to give up, but the <span class="vocab">compound</span> /ˈkɒmpaʊnd/ effects of small improvements began to show.', zh: '危机固有的复杂性可能诱惑许多人放弃，但小改进的复合效应开始显现。' },
+                    { en: 'With careful planning to <span class="vocab">insulate</span> /ˈɪnsjuleɪt/ vulnerable populations from shocks, confidence began to <span class="vocab">soar</span> /sɔː/.', zh: '通过仔细规划以使脆弱人群免受冲击，信心开始飙升。' },
+                    { en: 'The <span class="vocab">outline</span> /ˈaʊtlaɪn/ of success became clear: when policies <span class="vocab">overlap</span> /ˌəʊvəˈlæp/ with public needs and <span class="vocab">propel</span> /prəˈpel/ genuine progress, even the <span class="vocab">gross</span> /ɡrəʊs/ injustices can be overcome.', zh: '成功的轮廓变得清晰：当政策与公共需求重叠并推动真正的进步时，即使是严重的不公正也能被克服。' },
+                    { en: 'The government\'s <span class="vocab">stance</span> /stæns/ evolved from a rigid position to one that could <span class="vocab">snap</span> /snæp/ into action quickly when needed.', zh: '政府的立场从僵化的姿态演变为能够在需要时迅速采取行动的状态。' },
+                    { en: 'This transformation demonstrated that through unity and determination, a nation could emerge from crisis stronger than before.', zh: '这种转变表明，通过团结和决心，一个国家可以从危机中变得比以前更强大。' }
+                ]
+            },
+            'u19': {
+                title: "Align to Surpass: A Team's Reform Journey",
+                paragraphs: [
+                    { en: 'To <span class="vocab">align</span> /əˈlaɪn/ efforts across the team, we <span class="vocab">assemble</span> /əˈsembl/ a task force and embrace healthy <span class="vocab">variation</span> /ˌveəriˈeɪʃn/ in methods to avoid groupthink.', zh: '为使团队协同一致，我们集合专班，并接纳方法上的健康变体以避免群体思维。' },
+                    { en: 'A breakthrough demo gave investors a <span class="vocab">thrill</span> /θrɪl/ and helped us <span class="vocab">surpass</span> /səˈpɑːs/ rivals, yet we still drafted a partnership <span class="vocab">treaty</span> /ˈtriːti/ with suppliers who, we <span class="vocab">reckon</span></span> /ˈrekən/ (认为), could scale with us.', zh: '一次突破性演示令投资者激动，并帮助我们超越对手，但我们仍与供应商拟定条约；我们认为他们能与我们共同扩张。' },
+                    { en: 'To protect every <span class="vocab">victim</span> /ˈvɪktɪm/ of underfunding, we <span class="vocab">allocate</span> /ˈæləkeɪt/ resources and <span class="vocab">slash</span> /slæʃ/ waste in our <span class="vocab">domain</span> /dəʊˈmeɪn/ while <span class="vocab">retain</span> /rɪˈteɪn/ core talent.', zh: '为保护每一位因资金不足而受害的人，我们分配资源、削减浪费，同时保留核心人才。' },
+                    { en: 'Sharp like an <span class="vocab">eagle</span> /ˈiːɡl/ eye, audits <span class="vocab">render</span> /ˈrendə/ results that reveal where outside interests <span class="vocab">interfere</span> /ˌɪntəˈfɪə/ or <span class="vocab">intimidate</span> /ɪnˈtɪmɪdeɪt/ teams and <span class="vocab">grip</span> /ɡrɪp/ decision‑making.', zh: '像鹰眼一样敏锐，审计呈现的结果揭示出外部利益何处干扰或恐吓团队、攫取决策。' },
+                    { en: 'True reform may <span class="vocab">entail</span> /ɪnˈteɪl/ we <span class="vocab">embed</span> /ɪmˈbed/ safeguards when the first warning is only the tip of the <span class="vocab">iceberg</span> /ˈaɪsbɜːɡ/ (微露端倪的事物).', zh: '真正的改革可能需要我们嵌入保障机制，因为最初的警示往往只是冰山一角。' },
+                    { en: 'Every tough call demands <span class="vocab">justification</span> /ˌdʒʌstɪfɪˈkeɪʃn/; we <span class="vocab">contend</span> /kənˈtend/ that long‑term value and social <span class="vocab">legacy</span> /ˈleɡəsi/ outweigh short‑term optics.', zh: '每个艰难决定都需要正当理由；我们主张长期价值与社会遗产重于短期观感。' },
+                    { en: 'Instead of a lazy <span class="vocab">lounge</span> /laʊndʒ/ culture, we upgrade <span class="vocab">machinery</span> /məˈʃiːnəri/ and <span class="vocab">refrain</span> /rɪˈfreɪn/ from shortcuts, cultivating a resilient <span class="vocab">mindset</span> /ˈmaɪndset/.', zh: '我们不搞慵懒的休闲文化，而是升级机器、克制走捷径，培养有韧性的心态。' },
+                    { en: 'Leaders <span class="vocab">dedicate</span> /ˈdedɪkeɪt/ wins to team <span class="vocab">morality</span> /məˈræləti/ and never <span class="vocab">confine</span> /kənˈfaɪn/ credit, keeping the <span class="vocab">quest</span> /kwest/ for excellence alive.', zh: '领导者把胜利献给团队的道德准则，从不局限功劳归属，让对卓越的追求常存。' },
+                    { en: 'A sudden <span class="vocab">revelation</span> /ˌrevəˈleɪʃn/ helps us <span class="vocab">defeat</span> /dɪˈfiːt/ doubt; my <span class="vocab">spouse</span> /spaʊs/ and an old <span class="vocab">acquaintance</span> /əˈkweɪntəns/ join to <span class="vocab">deploy</span> /dɪˈplɔɪ/ pilots that <span class="vocab">intrigue</span> /ɪnˈtriːɡ/ and <span class="vocab">allure</span> /əˈljʊə/ early users.', zh: '一次突如其来的启示帮助我们战胜怀疑；我的配偶和一位旧识加入，部署试点，吸引并打动早期用户。' },
+                    { en: 'We <span class="vocab">owe</span> /əʊ/ <span class="vocab">morality</span> /məˈræləti/ and loyalty to users—not an <span class="vocab">aristocrat</span> /əˈrɪstəkræt/ elite—so when markets <span class="vocab">plunge</span> /plʌndʒ/ after an info <span class="vocab">assault</span> /əˈsɔːlt/, we refuse to <span class="vocab">presume</span> /prɪˈzjuːm/ guilt.', zh: '我们把道义与忠诚归于用户，而非贵族精英；因此当信息攻击后市场暴跌时，我们拒绝妄下定论。' },
+                    { en: 'Rumors <span class="vocab">brew</span> /bruː/ about rising <span class="vocab">casulty</span> /ˈkæʒuəlti/ numbers; facts may <span class="vocab">blur</span> /blɜː/ in a viral <span class="vocab">clip</span> /klɪp/, but upheaval must not <span class="vocab">displace</span> /dɪsˈpleɪs/ families from their homes.', zh: '关于伤亡数字上升的流言酝酿发酵；在一段爆红视频里事实也许变得模糊，但动荡不应迫使家庭离开家园。' }
+                ]
+            }
+            ,
+            'u20': {
+                title: "Scenario to Clarity: Tactics that Illuminate",
+                paragraphs: [
+                    { en: 'We <span class="vocab">embark</span> /ɪmˈbɑːk/ on an <span class="vocab">elaborate</span> /ɪˈlæbəreɪt/ study, designing a training <span class="vocab">scenario</span> /sɪˈnɑːriəʊ/ and a clear <span class="vocab">tactic</span> /ˈtæktɪk/ to <span class="vocab">enlighten</span> /ɪnˈlaɪtn/ beginners through steady <span class="vocab">endeavor</span> /ɪnˈdevə/.', zh: '我们着手进行一项精心的研究，设计训练情景与清晰战术，通过持续努力来启发初学者。' },
+                    { en: 'We <span class="vocab">envisage</span> /ɪnˈvɪzɪdʒ/ how to <span class="vocab">pool</span> /puːl/ tools for rapid <span class="vocab">transit</span> /ˈtrænzɪt/, removing bottlenecks that <span class="vocab">hamper</span> /ˈhæmpə/ delivery, and, to the <span class="vocab">extent</span> /ɪkˈstent/ possible, <span class="vocab">evade</span> /ɪˈveɪd/  可避免的错误。', zh: '我们设想把工具集中起来以便快速转运，消除妨碍交付的瓶颈，并在可能的范围内规避可避免的错误。' },
+                    { en: 'Our goals finally <span class="vocab">coincide</span> /ˌkəʊɪnˈsaɪd/ with outcomes as the plan <span class="vocab">embody</span> /ɪmˈbɒdi/ each core <span class="vocab">entity</span> /ˈentəti/; we build a <span class="vocab">duplicate</span> /ˈdjuːplɪkət/ prototype in one <span class="vocab">stroke</span> /strəʊk/ to <span class="vocab">illuminate</span> /ɪˈluːmɪneɪt/ the trade‑offs.', zh: '随着方案体现出每个核心实体，我们的目标终于与结果相吻合；我们一气呵成做出一个副本原型，以此阐明利弊取舍。' },
+                    { en: 'Tired teams still <span class="vocab">crave</span> /kreɪv/ clarity, yet refuse to <span class="vocab">dwell on</span> /dwel ɒn/ setbacks or <span class="vocab">dwell</span> /dwel/ in blame; a shared <span class="vocab">code</span> /kəʊd/ keeps discussions constructive.', zh: '疲惫的团队依然渴望清晰，但拒绝纠结于挫折或沉湎于指责；共同的道德准则让讨论保持建设性。' },
+                    { en: 'One presenter tried to <span class="vocab">coin</span> /kɔɪn/ buzzwords and <span class="vocab">romance</span> /rəʊˈmæns/ the data with a <span class="vocab">cheap</span> /tʃiːp/ gloss, but the audience <span class="vocab">clock</span> /klɒk/ the trick at once.', zh: '有人试图创造流行词并对数据加以虚构渲染，披上一层卑贱的浮光，但观众立刻察觉到了。' },
+                    { en: 'We refuse to <span class="vocab">prey</span> /preɪ/ on newcomers for favors; even when a mistake puts us in the <span class="vocab">dock</span> /dɒk/, we hold to our <span class="vocab">code</span> /kəʊd/ and fix the issue.', zh: '我们拒绝以新人成员为敲诈对象；即便失误把我们置于被告席，我们也坚守准则并解决问题。' },
+                    { en: 'After review, we <span class="vocab">crop</span> /krɒp/ the slides and re‑route <span class="vocab">transit</span> /ˈtrænzɪt/ paths, curing the busy‑work <span class="vocab">syndrome</span> /ˈsɪndrəʊm/ to a great <span class="vocab">extent</span> /ɪkˈstent/.', zh: '复盘之后，我们把演示文稿剪短并重新规划转运路径，在很大程度上治好了“瞎忙综合征”。' }
+                ]
+            },
+            'high_frequency': {
+                title: "High Frequency Vocabulary Collection",
+                paragraphs: [
+                    { en: "In the modern <span class=\"vocab\">corporate</span> /ˈkɔːpərət/ world, businesses must <span class=\"vocab\">thrive</span> /θraɪv/ through innovation and <span class=\"vocab\">collaboration</span> /kəˌlæbəˈreɪʃn/, <span class=\"vocab\">whereas</span> /weərˈæz/ traditional industries face <span class=\"vocab\">severe</span> /sɪˈvɪə/ challenges that require them to <span class=\"vocab\">modify</span> /ˈmɒdɪfaɪ/ their strategies.", zh: "在现代企业世界中，企业必须通过创新和协作来蓬勃发展，而传统行业面临严峻挑战，需要调整其策略。"},
+                    { en: "<span class=\"vocab\">Executive</span> /ɪɡˈzekjətɪv/ leaders must <span class=\"vocab\">account</span> /əˈkaʊnt/ for every decision, creating detailed <span class=\"vocab\">account</span> /əˈkaʊnt/ reports that <span class=\"vocab\">account</span> /əˈkaʊnt/ for market fluctuations, while exploring <span class=\"vocab\">exotic</span> /ɪɡˈzɒtɪk/ markets and maintaining <span class=\"vocab\">norm</span> /nɔːm/ standards.", zh: "执行领导必须解释每一个决定，创建详细说明市场波动的账户报告，同时探索异域市场并维持规范标准。"},
+                    { en: "Some <span class=\"vocab\">tribe</span> /traɪb/ communities <span class=\"vocab\">underestimate</span> /ˌʌndərˈestɪmeɪt/ the <span class=\"vocab\">impact</span> /ˈɪmpækt/ of technology, but we should never <span class=\"vocab\">underestimate</span> /ˌʌndərˈestɪmeɪt/ their wisdom, especially when dealing with <span class=\"vocab\">virgin</span> /ˈvɜːdʒɪn/ territories and clearing <span class=\"vocab\">debris</span> /ˈdebriː/ from natural disasters.", zh: "一些部落社区低估了技术的影响，但我们永远不应该低估他们的智慧，特别是在处理原始领土和清理自然灾害造成的碎片时。"},
+                    { en: "The <span class=\"vocab\">dramatic</span> /drəˈmætɪk/ changes in climate have a <span class=\"vocab\">dramatic</span> /drəˈmætɪk/ effect on ecosystems, forcing companies to <span class=\"vocab\">incorporate</span> /ɪnˈkɔːpəreɪt/ sustainable practices and <span class=\"vocab\">restore</span> /rɪˈstɔː/ damaged environments, despite <span class=\"vocab\">adverse</span> /ˈædvɜːs/ conditions.", zh: "气候的突然变化对生态系统产生了戏剧性的影响，迫使公司包含可持续实践并恢复受损环境，尽管条件不利。"},
+                    { en: "Scientists remain <span class=\"vocab\">alert</span> /əˈlɜːt/ to potential threats, using <span class=\"vocab\">alert</span> /əˈlɜːt/ systems to <span class=\"vocab\">reveal</span> /rɪˈviːl/ hidden patterns, while making an <span class=\"vocab\">appeal</span> /əˈpiːl/ to the public to <span class=\"vocab\">assume</span> /əˈsjuːm/ greater responsibility for environmental protection.", zh: "科学家对潜在威胁保持警觉，使用警报系统揭示隐藏的模式，同时呼吁公众承担更大的环境保护责任。"},
+                    { en: "The <span class=\"vocab\">destructive</span> /dɪˈstrʌktɪv/ force of the storm had a significant <span class=\"vocab\">impact</span> /ˈɪmpækt/ on the region, testing the <span class=\"vocab\">hypothesis</span> /haɪˈpɒθəsɪs/ about climate resilience and providing <span class=\"vocab\">incentive</span> /ɪnˈsentɪv/ for governments to <span class=\"vocab\">impose</span> /ɪmˈpəʊz/ stricter regulations.", zh: "风暴的破坏性力量对该地区产生了重大冲击，测试了关于气候韧性的假设，并为政府施加更严格的法规提供了激励。"},
+                    { en: "Investors must <span class=\"vocab\">purchase</span> /ˈpɜːtʃəs/ stocks carefully, <span class=\"vocab\">purchase</span> /ˈpɜːtʃəs/ their grip on market trends, while recognizing that some <span class=\"vocab\">phenomenon</span> /fəˈnɒmɪnən/ in the market are truly remarkable <span class=\"vocab\">phenomenon</span> /fəˈnɒmɪnən/ that deserve attention.", zh: "投资者必须仔细购买股票，握紧对市场趋势的把握，同时认识到市场中的一些杰出人物是真正值得关注的杰出人物。"},
+                    { en: "Technology <span class=\"vocab\">upgrade</span> /ˈʌpɡreɪd/ programs require <span class=\"vocab\">sophisticated</span> /səˈfɪstɪkeɪtɪd/ systems, offering <span class=\"vocab\">alternative</span> /ɔːlˈtɜːnətɪv/ solutions that seem <span class=\"vocab\">bizarre</span> /bɪˈzɑː/ to traditionalists, but create a safe <span class=\"vocab\">haven</span> /ˈheɪvn/ for innovation.", zh: "技术升级项目需要复杂的系统，提供对传统主义者来说似乎奇怪的替代方案，但为创新创造了安全的避风港。"},
+                    { en: "The budget <span class=\"vocab\">deficit</span> /ˈdefɪsɪt/ requires <span class=\"vocab\">adequate</span> /ˈædɪkwət/ funding to address, while increasing <span class=\"vocab\">revenue</span> /ˈrevənjuː/ through <span class=\"vocab\">ambitious</span> /æmˈbɪʃəs/ projects that are both <span class=\"vocab\">ambitious</span> /æmˈbɪʃəs/ in scope and <span class=\"vocab\">ambitious</span> /æmˈbɪʃəs/ in cost.", zh: "预算赤字需要充足的资金来解决，同时通过既耗资又耗时的雄心勃勃的项目来增加收入。"},
+                    { en: "Medical researchers develop new <span class=\"vocab\">antibiotic</span> /ˌæntibaɪˈɒtɪk/ treatments, helping doctors <span class=\"vocab\">interpret</span> /ɪnˈtɜːprɪt/ complex data, while the <span class=\"vocab\">electric</span> /ɪˈlektrɪk/ atmosphere in the lab is truly <span class=\"vocab\">electric</span> /ɪˈlektrɪk/ and full of excitement.", zh: "医学研究人员开发新的抗生素治疗，帮助医生解释复杂数据，而实验室中充满刺激的氛围确实充满刺激和兴奋。"},
+                    { en: "Universities <span class=\"vocab\">institute</span> /ˈɪnstɪtjuːt/ new policies to <span class=\"vocab\">institute</span> /ˈɪnstɪtjuːt/ better systems, preparing for potential economic <span class=\"vocab\">crash</span> /kræʃ/ scenarios through <span class=\"vocab\">crash</span> /kræʃ/ courses that provide <span class=\"vocab\">crash</span> /kræʃ/ training in emergency response.", zh: "大学建立新政策以建立更好的体系，通过提供应急响应速成培训的速成课程来为潜在的经济崩溃做准备。"},
+                    { en: "The findings are <span class=\"vocab\">significant</span> /sɪɡˈnɪfɪkənt/ in their implications, with <span class=\"vocab\">significant</span> /sɪɡˈnɪfɪkənt/ meaning that goes beyond surface analysis, as resources <span class=\"vocab\">diminish</span> /dɪˈmɪnɪʃ/ and critics attempt to <span class=\"vocab\">brand</span> /brænd/ the project unfairly, while foundations <span class=\"vocab\">grant</span> /ɡrɑːnt/ essential funding.", zh: "这些发现的意义是意味深长的，其意味深长的含义超越了表面分析，因为资源减少，批评者试图不公正地丑化该项目，而基金会授予必要的资金。"},
+                    { en: "<span class=\"vocab\">Vulnerable</span> /ˈvʌlnərəbl/ populations, especially <span class=\"vocab\">infant</span> /ˈɪnfənt/ children, can be <span class=\"vocab\">overwheln</span> /ˌəʊvəˈwelm/ by challenges, requiring <span class=\"vocab\">intellectual</span> /ˌɪntəˈlektʃuəl/ support and strategies that <span class=\"vocab\">yield</span> /jiːld/ positive results, while recognizing that the <span class=\"vocab\">ideal</span> /aɪˈdiːəl/ solution may be an <span class=\"vocab\">ideal</span> /aɪˈdiːəl/ that is hard to achieve.", zh: "脆弱的人群，特别是婴儿，可能被挑战压垮，需要智力支持和产生积极结果的策略，同时认识到理想的解决方案可能是一个难以实现的完美的人。"},
+                    { en: "<span class=\"vocab\">Intensive</span> /ɪnˈtensɪv/ programs help students <span class=\"vocab\">accuse</span> /əˈkjuːz/ problems from a new <span class=\"vocab\">perspective</span> /pəˈspektɪv/, learning to <span class=\"vocab\">isolate</span> /ˈaɪsəleɪt/ key factors and <span class=\"vocab\">cope</span> /kəʊp/ with stress, while avoiding <span class=\"vocab\">artificial</span> /ˌɑːtɪˈfɪʃl/ solutions that are <span class=\"vocab\">artificial</span> /ˌɑːtɪˈfɪʃl/ and lack authenticity.", zh: "强化项目帮助学生从新视角指责问题，学习隔离关键因素并应对压力，同时避免虚假且缺乏真实性的虚假解决方案。"},
+                    { en: "Muscles <span class=\"vocab\">contract</span> /kənˈtrækt/ during exercise, while people may <span class=\"vocab\">contract</span> /kənˈtrækt/ diseases in crowded areas, as media <span class=\"vocab\">portray</span> /pɔːˈtreɪ/ events and artists <span class=\"vocab\">exhibit</span> /ɪɡˈzɪbɪt/ works that show the <span class=\"vocab\">vital</span> /ˈvaɪtl/ importance of health, with <span class=\"vocab\">vital</span> /ˈvaɪtl/ communities that are <span class=\"vocab\">vital</span> /ˈvaɪtl/ and full of energy.", zh: "肌肉在运动时收缩，而人们可能在拥挤的地方感染疾病，媒体描绘事件，艺术家展示作品，显示健康的生机勃勃的重要性，拥有生机勃勃且充满活力的生机勃勃的社区。"},
+                    { en: "Success <span class=\"vocab\">consist</span> /kənˈsɪst/ in persistence, as systems <span class=\"vocab\">generate</span> /ˈdʒenəreɪt/ data that can <span class=\"vocab\">generate</span> /ˈdʒenəreɪt/ insights, while <span class=\"vocab\">dual</span> /ˈdjuːəl/ citizenship programs help people <span class=\"vocab\">tackle</span> /ˈtækl/ complex issues and <span class=\"vocab\">compel</span> /kəmˈpel/ action through the <span class=\"vocab\">notion</span> /ˈnəʊʃn/ of shared responsibility.", zh: "成功存在于坚持中，因为系统产生可以引起见解的数据，而双重公民身份项目帮助人们处理复杂问题，并通过共同责任的概念迫使采取行动。"},
+                    { en: "<span class=\"vocab\">Radical</span> /ˈrædɪkl/ reforms require <span class=\"vocab\">elite</span> /eɪˈliːt/ support, with <span class=\"vocab\">trial</span> /traɪəl/ programs leading to the <span class=\"vocab\">ultimate</span> /ˈʌltɪmət/ goal of securing <span class=\"vocab\">patent</span> /ˈpætnt/ protection, while students <span class=\"vocab\">absorb</span> /əbˈsɔːb/ knowledge that can <span class=\"vocab\">absorb</span> /əbˈsɔːb/ their full attention.", zh: "激进的改革需要精英支持，试验项目导致获得专利保护的最终目标，而学生吸收可以使他们全神贯注的知识。"},
+                    { en: "During economic <span class=\"vocab\">recession</span> /rɪˈseʃn/, many families are <span class=\"vocab\">deprive</span> /dɪˈpraɪv/ of opportunities, as educational <span class=\"vocab\">faculty</span> /ˈfæklti/ members use their <span class=\"vocab\">faculty</span> /ˈfæklti/ of reasoning to increase the <span class=\"vocab\">capacity</span> /kəˈpæsəti/ for learning, with systems operating at full <span class=\"vocab\">capacity</span> /kəˈpæsəti/ and maximum <span class=\"vocab\">capacity</span> /kəˈpæsəti/ power.", zh: "在经济衰退期间，许多家庭被剥夺了机会，而教育教职员工使用他们的推理才能来增加学习能力，系统以满功率运行。"},
+                    { en: "Experts <span class=\"vocab\">discount</span> /ˈdɪskaʊnt/ the importance of quick fixes, choosing to <span class=\"vocab\">discount</span> /ˈdɪskaʊnt/ those theories, while officials <span class=\"vocab\">appropriate</span> /əˈprəʊpriət/ funds that others might <span class=\"vocab\">appropriate</span> /əˈprəʊpriət/ illegally, as researchers <span class=\"vocab\">extract</span> /ɪkˈstrækt/ valuable information from data.", zh: "专家认为快速修复不重要，选择认为这些理论不重要，而官员挪用其他人可能非法挪用的资金，研究人员从数据中提取有价值的信息。"},
+                    { en: "Effective <span class=\"vocab\">management</span> /ˈmænɪdʒmənt/ requires strong <span class=\"vocab\">management</span> /ˈmænɪdʒmənt/ skills, as artists <span class=\"vocab\">depict</span> /dɪˈpɪkt/ scenes and create <span class=\"vocab\">graphic</span> /ˈɡræfɪk/ designs, while detectives <span class=\"vocab\">investigate</span> /ɪnˈvestɪɡeɪt/ cases and reach <span class=\"vocab\">accord</span> /əˈkɔːd/ on solutions, though some remain <span class=\"vocab\">reluctant</span> /rɪˈlʌktənt/ to cooperate.", zh: "有效的资方需要强大的处理能力，艺术家描绘场景并创建图形设计，而侦探调查案件并就解决方案达成一致，尽管有些人仍然不愿意合作。"},
+                    { en: "In nature, <span class=\"vocab\">predator</span> /ˈpredətə/ species adapt to changing <span class=\"vocab\">climate</span> /ˈklaɪmət/ conditions, reflecting the <span class=\"vocab\">climate</span> /ˈklaɪmət/ of opinion in society, while <span class=\"vocab\">excessive</span> /ɪkˈsesɪv/ consumption concerns <span class=\"vocab\">celebrity</span> /səˈlebrəti/ figures, as certain trends <span class=\"vocab\">obtain</span> /əbˈteɪn/ popularity and <span class=\"vocab\">obtain</span> /əbˈteɪn/ in various regions.", zh: "在自然界中，捕食者物种适应不断变化的气候条件，反映了社会中的思潮，而过度的消费让名人担忧，某些趋势存在并在各个地区流行。"},
+                    { en: "Newspaper <span class=\"vocab\">circulation</span> /ˌsɜːkjəˈleɪʃn/ numbers reflect readership, as leaders <span class=\"vocab\">assert</span> /əˈsɜːt/ their positions and recognize <span class=\"vocab\">distinct</span> /dɪˈstɪŋkt/ differences, while workers experience <span class=\"vocab\">fatigue</span> /fəˈtiːɡ/ and must identify <span class=\"vocab\">fake</span> /feɪk/ information that might <span class=\"vocab\">fuel</span> /fjuːəl/ conflict, with <span class=\"vocab\">fuel</span> /fjuːəl/ for debate coming from <span class=\"vocab\">fuel</span> /fjuːəl/ and provocative statements.", zh: "报纸发行量数字反映了读者群，领导者断言他们的立场并认识到明显的差异，而工人经历疲劳，必须识别可能引发冲突的虚假信息，辩论的刺激性言论来自刺激性言论。"},
+                    { en: "<span class=\"vocab\">Rational</span> /ˈræʃnəl/ thinking helps people avoid <span class=\"vocab\">exaggerate</span> /ɪɡˈzædʒəreɪt/ claims, while scientists work with chemical <span class=\"vocab\">solution</span> /səˈluːʃn/ and study the <span class=\"vocab\">solution</span> /səˈluːʃn/ process, as distractions can <span class=\"vocab\">distract</span> /dɪˈstrækt/ from important tasks, requiring <span class=\"vocab\">modest</span> /ˈmɒdɪst/ approaches.", zh: "理性思维帮助人们避免夸大声明，而科学家使用化学溶液并研究溶解过程，因为分心可能分散对重要任务的注意力，需要谦虚的方法。"},
+                    { en: "The national <span class=\"vocab\">census</span> /ˈsensəs/ provides data, while banks extend <span class=\"vocab\">credit</span> /ˈkredɪt/ to businesses, recognizing that <span class=\"vocab\">poverty</span> /ˈpɒvəti/ affects many, with <span class=\"vocab\">poverty</span> /ˈpɒvəti/ materials causing concern, as <span class=\"vocab\">coral</span> /ˈkɒrəl/ reefs display <span class=\"vocab\">coral</span> /ˈkɒrəl/ colors that are <span class=\"vocab\">coral</span> /ˈkɒrəl/ and pink.", zh: "全国人口普查提供数据，而银行向企业提供信贷，认识到贫困影响许多人，劣质材料引起关注，珊瑚礁显示红色和粉红色的珊瑚颜色。"},
+                    { en: "Breaking <span class=\"vocab\">stereotype</span> /ˈsteriətaɪp/ requires effort, as <span class=\"vocab\">domestic</span> /dəˈmestɪk/ policies <span class=\"vocab\">irritate</span> /ˈɪrɪteɪt/ some groups, creating <span class=\"vocab\">obligation</span> /ˌɒblɪˈɡeɪʃn/ for leaders to provide <span class=\"vocab\">brief</span> /briːf/ explanations, while some people <span class=\"vocab\">obsess</span> /əbˈses/ over details.", zh: "打破刻板印象需要努力，因为国内政策激怒了一些群体，为领导者提供了简要解释的义务，而有些人沉迷于细节。"},
+                    { en: "International <span class=\"vocab\">counterpart</span> /ˈkaʊntəpɑːt/ organizations work together, addressing <span class=\"vocab\">chronic</span> /ˈkrɒnɪk/ problems that are <span class=\"vocab\">chronic</span> /ˈkrɒnɪk/ and long-term, with <span class=\"vocab\">chronic</span> /ˈkrɒnɪk/ patients requiring <span class=\"vocab\">tremendous</span> /trɪˈmendəs/ support, as some may <span class=\"vocab\">commit</span> /kəˈmɪt/ crimes or even <span class=\"vocab\">commit</span> /kəˈmɪt/ suicide.", zh: "国际对应组织共同努力，解决慢性的长期问题，慢性患者需要巨大的支持，因为有些人可能犯罪甚至自杀。"},
+                    { en: "Projects are <span class=\"vocab\">bound</span> /baʊnd/ to succeed with proper planning, as governments establish nature <span class=\"vocab\">reserve</span> /rɪˈzɜːv/ areas and <span class=\"vocab\">reserve</span> /rɪˈzɜːv/ resources, while travelers <span class=\"vocab\">reserve</span> /rɪˈzɜːv/ hotel rooms, recognizing that <span class=\"vocab\">virtual</span> /ˈvɜːtʃuəl/ reality creates <span class=\"vocab\">virtual</span> /ˈvɜːtʃuəl/ experiences that are <span class=\"vocab\">virtual</span> /ˈvɜːtʃuəl/ and factually real.", zh: "项目在适当规划下必定会成功，政府建立自然保护区并储备资源，而旅行者预订酒店房间，认识到虚拟现实创造事实上的真实体验。"},
+                    { en: "<span class=\"vocab\">Moral</span> /ˈmɒrəl/ principles guide decisions, with <span class=\"vocab\">subtle</span> /ˈsʌtl/ differences in <span class=\"vocab\">texture</span> /ˈtekstʃə/ affecting quality, as <span class=\"vocab\">rigorous</span> /ˈrɪɡərəs/ standards <span class=\"vocab\">prolong</span> /prəˈlɒŋ/ research timelines, while <span class=\"vocab\">cognitive</span> /ˈkɒɡnətɪv/ development requires careful study.", zh: "道德原则指导决策，质地的细微差异影响质量，严格的标准延长研究时间表，而认知发展需要仔细研究。"},
+                    { en: "Politicians <span class=\"vocab\">court</span> /kɔːt/ public favor, trying to <span class=\"vocab\">court</span> /kɔːt/ voters, while people <span class=\"vocab\">indulge</span> /ɪnˈdʌldʒ/ in leisure activities, aware of the <span class=\"vocab\">hazard</span> /ˈhæzəd/ of ignoring safety, as the <span class=\"vocab\">burden</span> /ˈbɜːdn/ of responsibility requires <span class=\"vocab\">considerable</span> /kənˈsɪdərəbl/ effort.", zh: "政治家试图取悦公众，试图取悦选民，而人们沉迷于休闲活动，意识到忽视安全的危险，因为责任的负担需要相当大的努力。"},
+                    { en: "The <span class=\"vocab\">medium</span> /ˈmiːdiəm/ of communication evolves, as different <span class=\"vocab\">region</span> /ˈriːdʒən/ areas and body <span class=\"vocab\">region</span> /ˈriːdʒən/ require attention, while public <span class=\"vocab\">profile</span> /ˈprəʊfaɪl/ matters influence decisions, as companies <span class=\"vocab\">exploit</span> /ɪkˈsplɔɪt/ opportunities and <span class=\"vocab\">exhaust</span> /ɪɡˈzɔːst/ resources.", zh: "沟通媒介在演变，不同的地区区域和身体部位需要关注，而公众形象问题影响决策，公司利用机会并耗尽资源。"},
+                    { en: "<span class=\"vocab\">Persistent</span> /pəˈsɪstənt/ efforts lead to success, with <span class=\"vocab\">premium</span> /ˈpriːmiəm/ services requiring <span class=\"vocab\">premium</span> /ˈpriːmiəm/ insurance and <span class=\"vocab\">premium</span> /ˈpriːmiəm/ prices that are <span class=\"vocab\">premium</span> /ˈpriːmiəm/ and high, while people make <span class=\"vocab\">sacrifice</span> /ˈsækrɪfaɪs/ for their goals and <span class=\"vocab\">devise</span> /dɪˈvaɪz/ strategies.", zh: "持续的努力导致成功，优质服务需要高昂的保险费和高昂的价格，而人们为他们的目标做出牺牲并设计策略。"},
+                    { en: "Conditions <span class=\"vocab\">deteriorate</span> /dɪˈtɪəriəreɪt/ without intervention, as systems <span class=\"vocab\">exclude</span> /ɪkˈskluːd/ certain groups, while some individuals <span class=\"vocab\">possess</span> /pəˈzes/ qualities that <span class=\"vocab\">possess</span> /pəˈzes/ and control their behavior, sometimes making them <span class=\"vocab\">possess</span> /pəˈzes/ and act strangely, requiring <span class=\"vocab\">proof</span> /pruːf/ of competence.", zh: "没有干预，条件会恶化，系统排斥某些群体，而一些个人拥有支配和控制他们行为的品质，有时使他们言行失常，需要能力的证明。"},
+                    { en: "The medical <span class=\"vocab\">profession</span> /prəˈfeʃn/ includes the entire <span class=\"vocab\">profession</span> /prəˈfeʃn/ and its <span class=\"vocab\">profession</span> /prəˈfeʃn/ of peers, using <span class=\"vocab\">profession</span> /prəˈfeʃn/ for public <span class=\"vocab\">profession</span> /prəˈfeʃn/ and promotion, while obstacles <span class=\"vocab\">hinder</span> /ˈhɪndə/ progress and programs <span class=\"vocab\">foster</span> /ˈfɒstə/ development.", zh: "医疗行业包括整个同行及其同行的宣传，使用宣传进行公共宣传和推广，而障碍阻碍进步，项目促进发展。"},
+                    { en: "Companies <span class=\"vocab\">float</span> /fləʊt/ their stocks on markets, as researchers <span class=\"vocab\">derive</span> /dɪˈraɪv/ conclusions and identify <span class=\"vocab\">trait</span> /treɪt/ characteristics, while governments develop <span class=\"vocab\">scheme</span> /skiːm/ programs and create an <span class=\"vocab\">array</span> /əˈreɪ/ of options that can <span class=\"vocab\">trigger</span> /ˈtrɪɡə/ change.", zh: "公司在市场上股票上市，研究人员得出结论并识别特征，而政府制定计划项目并创建一系列可以触发变化的选项。"},
+                    { en: "People <span class=\"vocab\">cherish</span> /ˈtʃerɪʃ/ traditions while supporting <span class=\"vocab\">intiative</span> /ɪˈnɪʃətɪv/ programs, as resources <span class=\"vocab\">deplete</span> /dɪˈpliːt/ and studies <span class=\"vocab\">correlate</span> /ˈkɒrəleɪt/ data, with efforts to <span class=\"vocab\">eliminate</span> /ɪˈlɪmɪneɪt/ problems and reach <span class=\"vocab\">consensus</span> /kənˈsensəs/ on solutions.", zh: "人们珍惜传统，同时支持倡议项目，资源耗尽，研究关联数据，努力消除问题并就解决方案达成共识。"},
+                    { en: "Strategies <span class=\"vocab\">counter</span> /ˈkaʊntə/ threats, as leaders <span class=\"vocab\">confront</span> /kənˈfrʌnt/ challenges and recognize that <span class=\"vocab\">dinosaur</span> /ˈdaɪnəsɔː/ industries are like <span class=\"vocab\">dinosaur</span> /ˈdaɪnəsɔː/ that are outdated, with <span class=\"vocab\">dinosaur</span> /ˈdaɪnəsɔː/ technologies being <span class=\"vocab\">dinosaur</span> /ˈdaɪnəsɔː/ and obsolete, while scientists <span class=\"vocab\">demonstrate</span> /ˈdemənstreɪt/ results.", zh: "策略对抗威胁，领导者面对挑战并认识到恐龙行业就像过时的恐龙，恐龙技术是守旧落伍的，而科学家展示结果。"},
+                    { en: "Health officials address the <span class=\"vocab\">epidemic</span> /ˌepɪˈdemɪk/ crisis, as <span class=\"vocab\">congress</span> /ˈkɒŋɡres/ debates create <span class=\"vocab\">controversy</span> /ˈkɒntrəvɜːsi/, while markets <span class=\"vocab\">shrink</span> /ʃrɪŋk/ and people enjoy <span class=\"vocab\">pasta</span> /ˈpæstə/ meals, dealing with <span class=\"vocab\">pest</span> /pest/ problems and <span class=\"vocab\">assign</span> /əˈsaɪn/ responsibilities.", zh: "卫生官员应对流行病危机，国会辩论引发争议，市场萎缩，人们享受意大利面餐，处理害虫问题并分配责任。"},
+                    { en: "Challenges <span class=\"vocab\">pose</span> /pəʊz/ questions that <span class=\"vocab\">pose</span> /pəʊz/ difficulties, as problems <span class=\"vocab\">pose</span> /pəʊz/ threats and require inquiry, while people must not <span class=\"vocab\">neglect</span> /nɪˈɡlekt/ important issues or <span class=\"vocab\">bother</span> /ˈbɒðə/ others unnecessarily.", zh: "挑战造成需要质询的问题，问题造成威胁并需要提问，而人们不能忽视重要问题或不必要地打扰他人。"}
+                ]
+            }
+        };
+
+        // --- Core Application Logic ---
+
+        /**
+         * Parses the content, wraps phonetic symbols for click events, and returns the generated HTML.
+         * @param {string} id 'u17' or 'u18'
+         * @returns {string} HTML content
+         */
+        function renderContent(id) {
+            const data = contentData[id];
+            let html = '';
+
+            data.paragraphs.forEach(p => {
+                // Use a regular expression to find words and their phonetic symbols
+                // Regex matches: <span class="vocab">word</span> /phonetic/
+                const regex = /<span class="vocab">([^<]+)<\/span>\s*\/([^/]+)\//g;
+                
+                let processedEn = p.en.replace(regex, (match, word, phonetic) => {
+                    // Clean up word by removing parentheses (e.g., in "asset (有价值的人)")
+                    const cleanedWord = normalizeWord(word);
+                    const normalizedWord = cleanedWord.toLowerCase();
+                    // Replace the phonetic symbol with a clickable element
+                    // Add click handler to vocab word to scroll index
+                    return `<span class="vocab" data-vocab="${normalizedWord}" onclick="scrollIndexToWord('${normalizedWord}')">${word}</span> <span class="phonetic" onclick="speakWord('${cleanedWord}')">/${phonetic}/</span>`;
+                });
+
+                html += `
+                    <div class="paragraph border-l-4 border-indigo-400 pl-4 py-2">
+                        <div class="english text-lg text-gray-900">${processedEn}</div>
+                        <div class="chinese text-base text-gray-500 mt-1">${p.zh}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('article-title').textContent = data.title;
+            return html;
+        }
+
+        /**
+         * Displays the selected unit's content and updates the sidebar active state.
+         * @param {string} id 'u17' or 'u18'
+         */
+        function showContent(id) {
+            const initialMsg = document.getElementById('initial-message');
+            if (initialMsg) {
+                initialMsg.classList.add('hidden');
+            }
+            const contentBody = document.getElementById('article-body');
+            
+            // 1. Update Content
+            contentBody.innerHTML = renderContent(id);
+
+            // 2. Update Sidebar Active State
+            document.querySelectorAll('#sidebar a').forEach(link => {
+                link.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'text-white');
+                link.classList.add('text-gray-700', 'hover:bg-gray-100');
+            });
+
+            const activeLink = document.getElementById(`${id}-link`);
+            if (activeLink) {
+                activeLink.classList.remove('text-gray-700', 'hover:bg-gray-100');
+                activeLink.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'text-white');
+            }
+            // 3. 同步更新左侧词汇索引
+            renderVocabularyList(id);
+        }
+
+        // 词义映射（U15-U20）与提示逻辑
+        const vocabMeanings = {
+            // U15
+            'glamour': '魅力；诱惑力', 'imperial': '帝国的；皇家的', 'band': '按等级划分；捆绑', 'turbulent': '动荡的', 'compromise': '妥协', 'turmoil': '骚动；动乱', 'conducive': '有助于的', 'diploma': '文凭', 'utilize': '利用', 'ideology': '意识形态', 'patron': '资助人；赞助人', 'submerge': '淹没；掩盖', 'indigenous': '本土的；土著的', 'complement': '补充；补足', 'disorder': '无序；混乱', 'comply': '遵守', 'feminist': '女权主义者', 'compulsory': '强制的', 'pesticide': '农药', 'hectic': '繁忙的', 'converge': '汇聚；趋同', 'dilemma': '困境', 'provision': '供给；条款', 'disclose': '披露；公开', 'prevalent': '盛行的；普遍的', 'junk': '垃圾；废弃物', 'devastate': '摧毁；破坏', 'primitive': '原始的；落后的', 'refund': '退款', 'reap': '收获', 'hemisphere': '半球', 'legislation': '立法；法律', 'bust': '崩盘；破产', 'manuscript': '手稿', 'recipient': '受益者；接收者', 'mask': '掩饰；伪装', 'immune': '免疫的；不受影响的', 'optimism': '乐观', 'amplify': '放大；增强', 'reliance': '依赖', 'decay': '衰退；腐朽', 'pledge': '承诺；保证', 'profound': '深刻的', 'deceive': '欺骗', 'psychiatrist': '精神科医生', 'redundant': '多余的；冗余的',
+            // U16
+            'refuge': '避难；庇护', 'substantial': '大量的；可观的', 'transaction': '交易', 'deliberate': '审慎的；故意的', 'testimony': '证词', 'unprecedented': '前所未有的', 'discard': '丢弃；抛弃', 'verge': '边缘', 'civic': '市民的；公民的', 'discern': '辨别；识别', 'equivalent': '等量的；相当的', 'slum': '贫民窟；棚户区', 'collide': '相撞；冲突', 'solidarity': '团结', 'ethnic': '民族的；种族的', 'spite': '怨恨；尽管', 'settlement': '安置区；解决', 'toxic': '有毒的', 'specialty': '专科；特长', 'relay': '转达；转呈', 'subsidy': '补贴', 'casual': '临时的；随意的', 'skeleton': '骨干；骨架', 'bypass': '绕过；旁路', 'conservative': '保守的', 'segment': '板块；部分', 'rein': '缰绳；控制', 'conspicuous': '显眼的', 'territory': '领土；地盘', 'aspire': '渴望', 'aspiration': '抱负', 'flat': '单调的；公寓；平坦的', 'extraordinary': '非常的；特别的', 'formulate': '制定；构想', 'theft': '盗窃', 'pasture': '牧场；牧道', 'ingenious': '巧妙的；有独创性的', 'probe': '探测；调查', 'slight': '冷落；轻视', 'virtue': '美德', 'signify': '表明；象征', 'prominent': '显著的；突出的', 'garment': '服装', 'retrieve': '取回；检索', 'proposition': '提案；主张', 'liable': '有责任的；易于…的', 'aisle': '通道；过道',
+            // U17（常见义，部分覆盖）
+            'recruit': '招募', 'practitioner': '从业者', 'asset': '资产；有价值的人', 'liberal': '自由的；开明的', 'visualize': '想象；可视化', 'residential': '住宅的', 'unfold': '展开；透露', 'thesis': '论文', 'quote': '引用', 'masterpiece': '杰作', 'magnetic': '有吸引力的', 'imperative': '紧迫的；必要的', 'flaw': '缺陷', 'inevitable': '不可避免的', 'warehouse': '仓库', 'fixture': '固定装置', 'relic': '遗迹', 'fluctuate': '波动', 'scope': '范围', 'loom': '逼近；隐现', 'compose': '使平静；组成', 'deficiency': '不足', 'swamp': '使不堪承受；淹没', 'lens': '镜头；视角', 'quantify': '量化', 'simulate': '模拟', 'vocal': '直言不讳的', 'equity': '公平；股本', 'disposal': '处置；处理', 'counsel': '法律顾问', 'contradict': '与…矛盾', 'lawsuit': '诉讼', 'feasible': '可行的', 'compact': '紧凑的；协定', 'migrant': '移民', 'descendant': '后代', 'orient': '使适应；确定方向', 'toll': '代价；通行费', 'kidnap': '绑架', 'cocaine': '可卡因', 'vice': '恶行', 'wither': '枯萎；衰退', 'evaporate': '蒸发；消失', 'successive': '连续的', 'relentless': '不懈的；无情的', 'resistant': '抵抗的', 'manual': '手动的；手册', 'remedy': '补救；药物', 'surplus': '盈余', 'commute': '通勤',
+            // U18（常见义，部分覆盖）
+            'outset': '开始', 'coalition': '联合；联盟', 'monetary': '货币的', 'contaminated': '被污染的', 'integrity': '正直；完整性', 'standpoint': '立场', 'diagnose': '诊断', 'strive': '努力', 'parameters': '参数', 'format': '格式；框架', 'specifications': '规范；规格', 'curb': '抑制', 'draft': '草案', 'mechanical': '机械的；呆板的', 'alleviate': '减轻', 'incur': '招致；承担', 'skeptical': '怀疑的', 'contempt': '蔑视', 'aggravate': '加剧', 'stigma': '耻辱', 'intensify': '加剧', 'multitude': '大量', 'lane': '小巷；车道', 'sensible': '明智的', 'prevail': '占上风；流行', 'mutual': '相互的', 'discourse': '讨论', 'adhere': '坚持；黏附', 'discriminate': '歧视', 'prestige': '声望', 'coupons': '优惠券', 'vocational': '职业的', 'stable': '稳定的', 'stables': '马厩', 'logistics': '后勤；物流', 'grid': '电网；网格', 'ordeal': '严峻考验', 'stump': '难倒', 'distort': '歪曲', 'wrestle': '努力解决', 'inherent': '固有的', 'tempt': '诱惑', 'compound': '复合；加重', 'insulate': '隔离；绝缘', 'soar': '飙升', 'outline': '轮廓；概述', 'overlap': '重叠', 'propel': '推动', 'gross': '严重的；总的', 'stance': '立场', 'snap': '猛然行动',
+            // U19
+            'align': '对齐；校准；一致', 'variation': '变化；变体', 'assemble': '集合；装配', 'thrill': '激动；兴奋', 'surpass': '超越', 'treaty': '条约', 'reckon': '认为；估计', 'victim': '受害者', 'allocate': '分配', 'disgust': '厌恶', 'slash': '大幅削减；砍', 'domain': '领域', 'retain': '保留', 'eagle': '鹰', 'render': '使成为；呈现', 'interfere': '干扰', 'intimidate': '恐吓', 'grip': '紧握；掌控', 'entail': '需要；牵涉', 'embed': '嵌入', 'iceberg': '微露端倪的事物；冰山', 'justification': '正当理由', 'contend': '主张；争辩', 'legacy': '遗产；遗留问题', 'lounge': '休闲室；闲逛', 'machinery': '机器；机构', 'refrain': '克制；避免', 'mindset': '心态；思维模式', 'dedicate': '奉献；致力于', 'morality': '道德', 'confine': '限制；局限', 'quest': '追求；探索', 'revelation': '启示；揭示', 'defeat': '击败；战胜', 'spouse': '配偶', 'acquaintance': '熟人；认识', 'deploy': '部署；调动', 'intrigue': '激起兴趣；阴谋', 'allure': '诱惑；吸引力', 'owe': '（忠诚等）归于；欠', 'aristocrat': '贵族', 'plunge': '骤降；投入', 'assault': '攻击；抨击', 'presume': '假定；推测', 'brew': '酝酿；冲泡', 'casulty': '（=casualty）伤亡', 'blur': '模糊', 'clip': '片段；夹子；修剪', 'displace': '迫使（某人）离开家园',
+            // U20
+            'prey': '猎物；敲诈', 'coincide': '同时发生；相吻合', 'dock': '被告席', 'romance': '虚构；渲染', 'dwell': '居住；沉湎', 'dwell on': '纠结于；细想', 'scenario': '情景；设想', 'elaborate': '精心制作的；详尽阐述', 'embark': '着手；启程', 'syndrome': '综合征；一系列表现', 'embody': '体现；具体化', 'stroke': '一举；笔画；中风', 'endeavor': '努力；尝试', 'enlighten': '启发；启蒙', 'tactic': '战术；策略', 'envisage': '设想；展望', 'transit': '运输；转运', 'evade': '逃避；规避', 'hamper': '妨碍', 'illuminate': '照亮；阐明；使容光焕发', 'crave': '渴望；恳求', 'entity': '实体；独立存在物', 'duplicate': '复制；副本', 'extent': '程度；范围', 'cheap': '卑贱的；廉价的', 'coin': '创造（新词语）', 'clock': '注意到；察觉到', 'code': '道德准则；代码', 'crop': '剪短；收成', 'pool': '共用的资源；集中资源'
+        };
+
+        function normalizeWord(raw) {
+            const noParen = (raw || '').replace(/\s*\([^)]+\)/g, '');
+            const cleaned = noParen.replace(/^[^A-Za-z]+|[^A-Za-z\s-]+$/g, '');
+            return cleaned.trim();
+        }
+
+        /**
+         * 尝试将单词还原为原形（用于匹配索引中的单词）
+         * 处理常见的单三、复数、过去式等词形变化
+         * @param {string} word 单词（小写）
+         * @returns {string[]} 可能的原形列表（包括原词本身）
+         */
+        function getWordBaseForms(word) {
+            if (!word) return [];
+            const lowerWord = word.toLowerCase();
+            const candidates = [lowerWord]; // 首先尝试原词本身
+            
+            // 如果单词长度小于3，直接返回
+            if (lowerWord.length < 3) return candidates;
+            
+            // 处理复数/单三形式：-ies -> -y (如 studies -> study, cities -> city)
+            if (lowerWord.endsWith('ies') && lowerWord.length > 3) {
+                candidates.push(lowerWord.slice(0, -3) + 'y');
+            }
+            // 处理复数/单三形式：-ves -> -f/-fe (如 leaves -> leaf, knives -> knife)
+            else if (lowerWord.endsWith('ves') && lowerWord.length > 3) {
+                candidates.push(lowerWord.slice(0, -3) + 'f');
+                candidates.push(lowerWord.slice(0, -3) + 'fe');
+            }
+            // 处理复数/单三形式：-es (如 goes, watches, boxes)
+            else if (lowerWord.endsWith('es') && lowerWord.length > 2) {
+                const stem = lowerWord.slice(0, -2);
+                candidates.push(stem);
+            }
+            // 处理复数/单三形式：-s (如 adds, words, books)
+            else if (lowerWord.endsWith('s') && lowerWord.length > 1) {
+                const stem = lowerWord.slice(0, -1);
+                candidates.push(stem);
+            }
+            
+            // 处理过去式/过去分词：-ied -> -y (如 studied -> study)
+            if (lowerWord.endsWith('ied') && lowerWord.length > 3) {
+                candidates.push(lowerWord.slice(0, -3) + 'y');
+            }
+            // 处理过去式/过去分词：-ed
+            else if (lowerWord.endsWith('ed') && lowerWord.length > 2) {
+                const stem = lowerWord.slice(0, -2);
+                candidates.push(stem);
+                // 如果以辅音字母+ed结尾，可能是双写的情况（如 stopped -> stop）
+                if (lowerWord.length > 4) {
+                    const charBeforeEd = lowerWord[lowerWord.length - 3];
+                    const charBeforeThat = lowerWord[lowerWord.length - 4];
+                    if (charBeforeEd === charBeforeThat && /[bcdfghjklmnpqrstvwxyz]/.test(charBeforeEd)) {
+                        candidates.push(lowerWord.slice(0, -3));
+                    }
+                }
+            }
+            
+            // 处理现在分词：-ing
+            if (lowerWord.endsWith('ing') && lowerWord.length > 3) {
+                const stem = lowerWord.slice(0, -3);
+                candidates.push(stem);
+                // 如果以 e+ing 结尾，去掉 ing 后加 e（如 making -> make）
+                if (lowerWord.endsWith('eing') && lowerWord.length > 4) {
+                    candidates.push(lowerWord.slice(0, -3) + 'e');
+                }
+                // 如果以辅音字母+ing结尾，可能是双写的情况（如 stopping -> stop）
+                else if (lowerWord.length > 5) {
+                    const charBeforeIng = lowerWord[lowerWord.length - 4];
+                    const charBeforeThat = lowerWord[lowerWord.length - 5];
+                    if (charBeforeIng === charBeforeThat && /[bcdfghjklmnpqrstvwxyz]/.test(charBeforeIng)) {
+                        candidates.push(lowerWord.slice(0, -4));
+                    }
+                }
+            }
+            
+            // 处理比较级：-er
+            if (lowerWord.endsWith('er') && lowerWord.length > 2 && !lowerWord.endsWith('ier')) {
+                candidates.push(lowerWord.slice(0, -2));
+            }
+            
+            // 处理最高级：-est
+            if (lowerWord.endsWith('est') && lowerWord.length > 3 && !lowerWord.endsWith('iest')) {
+                candidates.push(lowerWord.slice(0, -3));
+            }
+            
+            // 去重并返回
+            return [...new Set(candidates)];
+        }
+
+        const unitVocabulary = {
+            'u11': [
+                { word: 'endose', pos: 'v.', meaning: '背书；支持' },
+                { word: 'rival', pos: 'n.', meaning: '对手；竞争者' },
+                { word: 'principal', pos: 'adj.', meaning: '首要的；主要的' },
+                { word: 'readily', pos: 'adv.', meaning: '轻易地；乐意地' },
+                { word: 'rivalry', pos: 'n.', meaning: '竞争；对抗' },
+                { word: 'solitary', pos: 'adj.', meaning: '孤独的；单独的' },
+                { word: 'underlie', pos: 'v.', meaning: '构成基础；位于…之下' },
+                { word: 'graze', pos: 'v.', meaning: '吃草；放牧' },
+                { word: 'warrant', pos: 'v.', meaning: '使有必要；保证' },
+                { word: 'indifferent', pos: 'adj.', meaning: '漠不关心的' },
+                { word: 'mortgage', pos: 'n.', meaning: '抵押贷款' },
+                { word: 'penalty', pos: 'n.', meaning: '惩罚；罚金' },
+                { word: 'repay', pos: 'v.', meaning: '偿还；报答' },
+                { word: 'compatible', pos: 'adj.', meaning: '兼容的；相容的' },
+                { word: 'undermine', pos: 'v.', meaning: '削弱；破坏' },
+                { word: 'fatal', pos: 'adj.', meaning: '致命的；极其严重的' },
+                { word: 'pave', pos: 'v.', meaning: '铺路；铺设' },
+                { word: 'eligible', pos: 'adj.', meaning: '有资格的；合格的' },
+                { word: 'induce', pos: 'v.', meaning: '诱导；引起' },
+                { word: 'epic', pos: 'adj.', meaning: '史诗般的；宏大的' },
+                { word: 'exclusive', pos: 'adj.', meaning: '专属的；独有的' },
+                { word: 'magnify', pos: 'v.', meaning: '放大；夸大' },
+                { word: 'explicit', pos: 'adj.', meaning: '清晰直白的' },
+                { word: 'manipulate', pos: 'v.', meaning: '操纵；熟练控制' },
+                { word: 'milestone', pos: 'n.', meaning: '里程碑；重要事件' },
+                { word: 'expire', pos: 'v.', meaning: '到期；期满' },
+                { word: 'metropolitan', pos: 'adj.', meaning: '大都市的' },
+                { word: 'erode', pos: 'v.', meaning: '侵蚀；削弱' },
+                { word: 'flip', pos: 'v.', meaning: '快速翻转；翻新' },
+                { word: 'miniature', pos: 'adj.', meaning: '微型的；袖珍的' },
+                { word: 'essence', pos: 'n.', meaning: '本质；精髓' },
+                { word: 'quantitative', pos: 'adj.', meaning: '定量的' },
+                { word: 'impart', pos: 'v.', meaning: '传授；给予' },
+                { word: 'inferior', pos: 'adj.', meaning: '较差的；自卑的' },
+                { word: 'resort', pos: 'v.', meaning: '求助；诉诸' },
+                { word: 'infinite', pos: 'adj.', meaning: '无限的；无穷的' },
+                { word: 'shed', pos: 'v.', meaning: '摆脱；流出' },
+                { word: 'intrinsic', pos: 'adj.', meaning: '固有的；内在的' },
+                { word: 'substitute', pos: 'n.', meaning: '替代物；代用品' },
+                { word: 'suicide', pos: 'n.', meaning: '自杀' }
+            ],
+            'u12': [
+                { word: 'jeopardize', pos: 'v.', meaning: '危及；损害' },
+                { word: 'acceptance', pos: 'n.', meaning: '接受；顺从' },
+                { word: 'legitimate', pos: 'adj.', meaning: '合法的；正当的' },
+                { word: 'chase', pos: 'v.', meaning: '追逐；追捕' },
+                { word: 'carbohydrate', pos: 'n.', meaning: '碳水化合物' },
+                { word: 'cling', pos: 'v.', meaning: '抓紧；依附' },
+                { word: 'marginal', pos: 'adj.', meaning: '边缘的；微小的' },
+                { word: 'surge', pos: 'n./v.', meaning: '激增；涌动' },
+                { word: 'verbal', pos: 'adj.', meaning: '口头的；与言辞相关的' },
+                { word: 'linger', pos: 'v.', meaning: '逗留；萦绕' },
+                { word: 'medieval', pos: 'adj.', meaning: '中世纪的' },
+                { word: 'midst', pos: 'n.', meaning: '中间；当中' },
+                { word: 'cumulative', pos: 'adj.', meaning: '累积的' },
+                { word: 'destruction', pos: 'n.', meaning: '毁灭；破坏' },
+                { word: 'notorious', pos: 'adj.', meaning: '臭名昭著的' },
+                { word: 'bulk', pos: 'n.', meaning: '大部分；体积' },
+                { word: 'compensate', pos: 'v.', meaning: '补偿；弥补' },
+                { word: 'orientation', pos: 'n.', meaning: '培训；定位' },
+                { word: 'elementary', pos: 'adj.', meaning: '基础的；初步的' },
+                { word: 'overstate', pos: 'v.', meaning: '夸大；言过其实' },
+                { word: 'moan', pos: 'v.', meaning: '抱怨；呻吟' },
+                { word: 'indispensable', pos: 'adj.', meaning: '不可或缺的' },
+                { word: 'wind', pos: 'v.', meaning: '蜿蜒；盘旋' },
+                { word: 'evalute', pos: 'v.', meaning: '评估；估量' },
+                { word: 'longevity', pos: 'n.', meaning: '长寿；寿命' },
+                { word: 'munnicipal', pos: 'adj.', meaning: '市政的；地方政府的' },
+                { word: 'oppress', pos: 'v.', meaning: '压迫；欺凌' },
+                { word: 'liability', pos: 'n.', meaning: '责任；债务' },
+                { word: 'patrol', pos: 'v.', meaning: '巡逻；巡视' },
+                { word: 'robust', pos: 'adj.', meaning: '强健的；结实的' },
+                { word: 'dazzle', pos: 'v.', meaning: '使炫目；令人赞叹' },
+                { word: 'peninsula', pos: 'n.', meaning: '半岛' },
+                { word: 'designate', pos: 'v.', meaning: '指定；划定' },
+                { word: 'subsistence', pos: 'n.', meaning: '生计；勉强糊口' },
+                { word: 'panic', pos: 'n./v.', meaning: '恐慌；惊慌' },
+                { word: 'calcium', pos: 'n.', meaning: '钙' },
+                { word: 'provoke', pos: 'v.', meaning: '激起；挑衅' },
+                { word: 'respective', pos: 'adj.', meaning: '各自的；分别的' },
+                { word: 'saturate', pos: 'v.', meaning: '浸透；使饱和' },
+                { word: 'susceptible', pos: 'adj.', meaning: '易受影响的；敏感的' },
+                { word: 'tame', pos: 'v.', meaning: '驯服；使平淡' },
+                { word: 'geniune', pos: 'adj.', meaning: '真诚的；真正的' },
+                { word: 'exert', pos: 'v.', meaning: '施加；运用' },
+                { word: 'grave', pos: 'adj.', meaning: '严重的；严肃的' },
+                { word: 'tedious', pos: 'adj.', meaning: '冗长乏味的' }
+            ],
+            'u13': [
+                { word: 'imitation', pos: 'n.', meaning: '模仿；仿制品' },
+                { word: 'cholesterol', pos: 'n.', meaning: '胆固醇' },
+                { word: 'hover', pos: 'v.', meaning: '盘旋；徘徊' },
+                { word: 'jury', pos: 'n.', meaning: '陪审团；评审团' },
+                { word: 'aggressive', pos: 'adj.', meaning: '积极进取的；好斗的' },
+                { word: 'silicon', pos: 'n.', meaning: '硅' },
+                { word: 'dim', pos: 'adj.', meaning: '昏暗的；模糊的' },
+                { word: 'expedition', pos: 'n.', meaning: '探险；远征' },
+                { word: 'desirable', pos: 'adj.', meaning: '令人向往的' },
+                { word: 'satisfaction', pos: 'n.', meaning: '满足；清偿' },
+                { word: 'entitle', pos: 'v.', meaning: '使有权；授予资格' },
+                { word: 'faith', pos: 'n.', meaning: '信念；信任' },
+                { word: 'empirical', pos: 'adj.', meaning: '经验的；以经验为依据的' },
+                { word: 'satire', pos: 'n.', meaning: '讽刺；讽刺作品' },
+                { word: 'nonetheless', pos: 'adv.', meaning: '尽管如此；仍然' },
+                { word: 'paradox', pos: 'n.', meaning: '悖论；自相矛盾' },
+                { word: 'strand', pos: 'v.', meaning: '使搁浅；滞留' },
+                { word: 'consent', pos: 'n.', meaning: '同意；许可' },
+                { word: 'monopoly', pos: 'n.', meaning: '垄断；独占' },
+                { word: 'crude', pos: 'adj.', meaning: '粗糙的；粗鲁的' },
+                { word: 'margin', pos: 'n.', meaning: '利润；边缘' },
+                { word: 'beforehand', pos: 'adv.', meaning: '事先；预先' },
+                { word: 'convert', pos: 'v.', meaning: '转换；改装' },
+                { word: 'breakdown', pos: 'n.', meaning: '故障；崩溃' },
+                { word: 'prospective', pos: 'adj.', meaning: '预期的；未来的' },
+                { word: 'inspiration', pos: 'n.', meaning: '灵感；启发' },
+                { word: 'precisely', pos: 'adv.', meaning: '精确地；恰好' },
+                { word: 'incidence', pos: 'n.', meaning: '发生率' },
+                { word: 'bolster', pos: 'v.', meaning: '支撑；增强' },
+                { word: 'implication', pos: 'n.', meaning: '含义；可能的影响' },
+                { word: 'handicap', pos: 'n.', meaning: '障碍；不利条件' },
+                { word: 'segregate', pos: 'v.', meaning: '隔离；分离' },
+                { word: 'setback', pos: 'n.', meaning: '挫折；倒退' },
+                { word: 'sheer', pos: 'adj.', meaning: '完全的；十足的' },
+                { word: 'fraud', pos: 'n.', meaning: '欺诈；骗局' },
+                { word: 'combat', pos: 'v.', meaning: '对抗；打击' },
+                { word: 'slack', pos: 'v.', meaning: '松懈；放慢' },
+                { word: 'ingenuity', pos: 'n.', meaning: '独创性；巧思' },
+                { word: 'presumably', pos: 'adv.', meaning: '据推测；大概' },
+                { word: 'triple', pos: 'v.', meaning: '使成三倍' },
+                { word: 'bureaucracy', pos: 'n.', meaning: '官僚主义；官僚机构' },
+                { word: 'contest', pos: 'n.', meaning: '竞赛；争夺' },
+                { word: 'turnover', pos: 'n.', meaning: '周转率；营业额' },
+                { word: 'comparable', pos: 'adj.', meaning: '可比较的；相当的' }
+            ],
+            'u14': [
+                { word: 'bouns', pos: 'n.', meaning: '奖金；额外奖励' },
+                { word: 'verify', pos: 'v.', meaning: '核实；证实' },
+                { word: 'catastrophe', pos: 'n.', meaning: '灾难；大祸' },
+                { word: 'viable', pos: 'adj.', meaning: '可行的；能生存的' },
+                { word: 'chamber', pos: 'n.', meaning: '房间；腔室' },
+                { word: 'transcend', pos: 'v.', meaning: '超越；胜过' },
+                { word: 'cricket', pos: 'n.', meaning: '板球' },
+                { word: 'vigorous', pos: 'adj.', meaning: '有活力的；强健的' },
+                { word: 'cable', pos: 'n.', meaning: '电缆；绳索' },
+                { word: 'agreeable', pos: 'adj.', meaning: '令人愉快的；随和的' },
+                { word: 'belly', pos: 'n.', meaning: '腹部；肚子' },
+                { word: 'plague', pos: 'n.', meaning: '瘟疫；困扰' },
+                { word: 'plausible', pos: 'adj.', meaning: '貌似可信的' },
+                { word: 'aviation', pos: 'n.', meaning: '航空；飞行' },
+                { word: 'conserve', pos: 'v.', meaning: '保护；保存' },
+                { word: 'prescription', pos: 'n.', meaning: '处方；药方' },
+                { word: 'colonial', pos: 'adj.', meaning: '殖民地的' },
+                { word: 'appliance', pos: 'n.', meaning: '器具；电器' },
+                { word: 'aggregate', pos: 'v.', meaning: '聚合；合计' },
+                { word: 'proclaim', pos: 'v.', meaning: '宣告；公布' },
+                { word: 'default', pos: 'v.', meaning: '违约；拖欠' },
+                { word: 'spacious', pos: 'adj.', meaning: '宽敞的' },
+                { word: 'dictate', pos: 'v.', meaning: '支配；口述' },
+                { word: 'span', pos: 'n.', meaning: '跨度；范围' },
+                { word: 'dominant', pos: 'adj.', meaning: '占主导的' },
+                { word: 'threshold', pos: 'n.', meaning: '门槛；界限' },
+                { word: 'speculate', pos: 'v.', meaning: '推测；投机' },
+                { word: 'engagement', pos: 'n.', meaning: '参与；约定' },
+                { word: 'venture', pos: 'n.', meaning: '风险项目；企业' },
+                { word: 'exceed', pos: 'v.', meaning: '超过' },
+                { word: 'extensive', pos: 'adj.', meaning: '广阔的；大量的' },
+                { word: 'ferry', pos: 'n.', meaning: '渡船；摆渡' },
+                { word: 'spoil', pos: 'v.', meaning: '破坏；腐坏' },
+                { word: 'neutral', pos: 'adj.', meaning: '中性的；中立的' },
+                { word: 'hierarchy', pos: 'n.', meaning: '等级制度' },
+                { word: 'deem', pos: 'v.', meaning: '认为；视为' },
+                { word: 'offspring', pos: 'n.', meaning: '子女；后代' },
+                { word: 'fiscal', pos: 'adj.', meaning: '财政的；国库的' },
+                { word: 'sneak', pos: 'v.', meaning: '偷偷做；潜行' },
+                { word: 'evil', pos: 'adj.', meaning: '邪恶的' },
+                { word: 'hygiene', pos: 'n.', meaning: '卫生；清洁' },
+                { word: 'testify', pos: 'v.', meaning: '作证；证明' },
+                { word: 'tragic', pos: 'adj.', meaning: '悲惨的；悲剧的' },
+                { word: 'unleash', pos: 'v.', meaning: '释放；引发' },
+                { word: 'violate', pos: 'v.', meaning: '违背；侵犯' }
+            ],
+            'u15': [
+                { word: 'glamour', pos: 'n.' },
+                { word: 'imperial', pos: 'adj.' },
+                { word: 'band', pos: 'v.' },
+                { word: 'turbulent', pos: 'adj.' },
+                { word: 'compromise', pos: 'n.' },
+                { word: 'turmoil', pos: 'n.' },
+                { word: 'conducive', pos: 'adj.' },
+                { word: 'diploma', pos: 'n.' },
+                { word: 'utilize', pos: 'v.' },
+                { word: 'ideology', pos: 'n.' },
+                { word: 'patron', pos: 'n.' },
+                { word: 'submerge', pos: 'v.' },
+                { word: 'indigenous', pos: 'adj.' },
+                { word: 'complement', pos: 'v.' },
+                { word: 'disorder', pos: 'n.' },
+                { word: 'comply', pos: 'v.' },
+                { word: 'feminist', pos: 'n.' },
+                { word: 'compulsory', pos: 'adj.' },
+                { word: 'pesticide', pos: 'n.' },
+                { word: 'hectic', pos: 'adj.' },
+                { word: 'converge', pos: 'v.' },
+                { word: 'dilemma', pos: 'n.' },
+                { word: 'provision', pos: 'n.' },
+                { word: 'disclose', pos: 'v.' },
+                { word: 'prevalent', pos: 'adj.' },
+                { word: 'junk', pos: 'n.' },
+                { word: 'devastate', pos: 'v.' },
+                { word: 'primitive', pos: 'adj.' },
+                { word: 'refund', pos: 'n.' },
+                { word: 'reap', pos: 'v.' },
+                { word: 'hemisphere', pos: 'n.' },
+                { word: 'legislation', pos: 'n.' },
+                { word: 'bust', pos: 'n.' },
+                { word: 'manuscript', pos: 'n.' },
+                { word: 'recipient', pos: 'n.' },
+                { word: 'mask', pos: 'v.' },
+                { word: 'immune', pos: 'adj.' },
+                { word: 'optimism', pos: 'n.' },
+                { word: 'amplify', pos: 'v.' },
+                { word: 'reliance', pos: 'n.' },
+                { word: 'decay', pos: 'v.' },
+                { word: 'pledge', pos: 'n.' },
+                { word: 'profound', pos: 'adj.' },
+                { word: 'deceive', pos: 'v.' },
+                { word: 'psychiatrist', pos: 'n.' },
+                { word: 'redundant', pos: 'adj.' }
+            ],
+            'u16': [
+                { word: 'refuge', pos: 'n.' },
+                { word: 'substantial', pos: 'adj.' },
+                { word: 'transaction', pos: 'n.' },
+                { word: 'deliberate', pos: 'adj.' },
+                { word: 'testimony', pos: 'n.' },
+                { word: 'unprecedented', pos: 'adj.' },
+                { word: 'discard', pos: 'v.' },
+                { word: 'verge', pos: 'n.' },
+                { word: 'civic', pos: 'adj.' },
+                { word: 'discern', pos: 'v.' },
+                { word: 'equivalent', pos: 'adj.' },
+                { word: 'slum', pos: 'n.' },
+                { word: 'collide', pos: 'v.' },
+                { word: 'solidarity', pos: 'n.' },
+                { word: 'ethnic', pos: 'adj.' },
+                { word: 'spite', pos: 'n.' },
+                { word: 'settlement', pos: 'n.' },
+                { word: 'toxic', pos: 'adj.' },
+                { word: 'specialty', pos: 'n.' },
+                { word: 'relay', pos: 'v.' },
+                { word: 'subsidy', pos: 'n.' },
+                { word: 'casual', pos: 'adj.' },
+                { word: 'skeleton', pos: 'n.' },
+                { word: 'bypass', pos: 'v.' },
+                { word: 'conservative', pos: 'adj.' },
+                { word: 'segment', pos: 'n.' },
+                { word: 'rein', pos: 'n.' },
+                { word: 'conspicuous', pos: 'adj.' },
+                { word: 'territory', pos: 'n.' },
+                { word: 'aspire', pos: 'v.' },
+                { word: 'aspiration', pos: 'n.' },
+                { word: 'flat', pos: 'adj.' },
+                { word: 'extraordinary', pos: 'adj.' },
+                { word: 'formulate', pos: 'v.' },
+                { word: 'theft', pos: 'n.' },
+                { word: 'pasture', pos: 'n.' },
+                { word: 'ingenious', pos: 'adj.' },
+                { word: 'probe', pos: 'v.' },
+                { word: 'slight', pos: 'v.' },
+                { word: 'virtue', pos: 'n.' },
+                { word: 'signify', pos: 'v.' },
+                { word: 'prominent', pos: 'adj.' },
+                { word: 'garment', pos: 'n.' },
+                { word: 'retrieve', pos: 'v.' },
+                { word: 'proposition', pos: 'n.' },
+                { word: 'liable', pos: 'adj.' },
+                { word: 'aisle', pos: 'n.' }
+            ],
+            'u17': [
+                { word: 'recruit', pos: 'v.' },
+                { word: 'practitioner', pos: 'n.' },
+                { word: 'asset', pos: 'n.' },
+                { word: 'liberal', pos: 'adj.' },
+                { word: 'visualize', pos: 'v.' },
+                { word: 'residential', pos: 'adj.' },
+                { word: 'unfold', pos: 'v.' },
+                { word: 'thesis', pos: 'n.' },
+                { word: 'quote', pos: 'v.' },
+                { word: 'masterpiece', pos: 'n.' },
+                { word: 'magnetic', pos: 'adj.' },
+                { word: 'imperative', pos: 'adj.' },
+                { word: 'flaw', pos: 'n.' },
+                { word: 'inevitable', pos: 'adj.' },
+                { word: 'warehouse', pos: 'n.' },
+                { word: 'fixture', pos: 'n.' },
+                { word: 'relic', pos: 'n.' },
+                { word: 'fluctuate', pos: 'v.' },
+                { word: 'scope', pos: 'n.' },
+                { word: 'loom', pos: 'v.' },
+                { word: 'compose', pos: 'v.' },
+                { word: 'deficiency', pos: 'n.' },
+                { word: 'swamp', pos: 'v.' },
+                { word: 'lens', pos: 'n.' },
+                { word: 'quantify', pos: 'v.' },
+                { word: 'simulate', pos: 'v.' },
+                { word: 'vocal', pos: 'adj.' },
+                { word: 'equity', pos: 'n.' },
+                { word: 'disposal', pos: 'n.' },
+                { word: 'counsel', pos: 'n.' },
+                { word: 'contradict', pos: 'v.' },
+                { word: 'lawsuit', pos: 'n.' },
+                { word: 'feasible', pos: 'adj.' },
+                { word: 'compact', pos: 'adj.' },
+                { word: 'migrant', pos: 'n.' },
+                { word: 'descendant', pos: 'n.' },
+                { word: 'orient', pos: 'v.' },
+                { word: 'toll', pos: 'n.' },
+                { word: 'kidnap', pos: 'v.' },
+                { word: 'cocaine', pos: 'n.' },
+                { word: 'vice', pos: 'n.' },
+                { word: 'wither', pos: 'v.' },
+                { word: 'evaporate', pos: 'v.' },
+                { word: 'successive', pos: 'adj.' },
+                { word: 'relentless', pos: 'adj.' },
+                { word: 'resistant', pos: 'adj.' },
+                { word: 'manual', pos: 'adj.' },
+                { word: 'remedy', pos: 'n.' },
+                { word: 'surplus', pos: 'n.' },
+                { word: 'commute', pos: 'n./v.' }
+            ],
+            'u18': [
+                { word: 'outset', pos: 'n.' },
+                { word: 'coalition', pos: 'n.' },
+                { word: 'monetary', pos: 'adj.' },
+                { word: 'contaminated', pos: 'adj.' },
+                { word: 'integrity', pos: 'n.' },
+                { word: 'standpoint', pos: 'n.' },
+                { word: 'diagnose', pos: 'v.' },
+                { word: 'strive', pos: 'v.' },
+                { word: 'parameters', pos: 'n.' },
+                { word: 'format', pos: 'n.' },
+                { word: 'specifications', pos: 'n.' },
+                { word: 'curb', pos: 'v.' },
+                { word: 'draft', pos: 'n.' },
+                { word: 'mechanical', pos: 'adj.' },
+                { word: 'alleviate', pos: 'v.' },
+                { word: 'incur', pos: 'v.' },
+                { word: 'skeptical', pos: 'adj.' },
+                { word: 'contempt', pos: 'n.' },
+                { word: 'aggravate', pos: 'v.' },
+                { word: 'stigma', pos: 'n.' },
+                { word: 'intensify', pos: 'v.' },
+                { word: 'multitude', pos: 'n.' },
+                { word: 'lane', pos: 'n.' },
+                { word: 'sensible', pos: 'adj.' },
+                { word: 'prevail', pos: 'v.' },
+                { word: 'mutual', pos: 'adj.' },
+                { word: 'discourse', pos: 'n.' },
+                { word: 'adhere', pos: 'v.' },
+                { word: 'discriminate', pos: 'v.' },
+                { word: 'prestige', pos: 'n.' },
+                { word: 'coupons', pos: 'n.' },
+                { word: 'vocational', pos: 'adj.' },
+                { word: 'stable', pos: 'adj.' },
+                { word: 'stables', pos: 'n.' },
+                { word: 'logistics', pos: 'n.' },
+                { word: 'grid', pos: 'n.' },
+                { word: 'ordeal', pos: 'n.' },
+                { word: 'stump', pos: 'v.' },
+                { word: 'distort', pos: 'v.' },
+                { word: 'wrestle', pos: 'v.' },
+                { word: 'inherent', pos: 'adj.' },
+                { word: 'tempt', pos: 'v.' },
+                { word: 'compound', pos: 'v.' },
+                { word: 'insulate', pos: 'v.' },
+                { word: 'soar', pos: 'v.' },
+                { word: 'outline', pos: 'n.' },
+                { word: 'overlap', pos: 'v.' },
+                { word: 'propel', pos: 'v.' },
+                { word: 'gross', pos: 'adj.' },
+                { word: 'stance', pos: 'n.' },
+                { word: 'snap', pos: 'v.' }
+            ],
+            'u19': [
+                { word: 'align', pos: 'v.' },
+                { word: 'assemble', pos: 'v.' },
+                { word: 'variation', pos: 'n.' },
+                { word: 'thrill', pos: 'n.' },
+                { word: 'surpass', pos: 'v.' },
+                { word: 'treaty', pos: 'n.' },
+                { word: 'reckon', pos: 'v.' },
+                { word: 'victim', pos: 'n.' },
+                { word: 'allocate', pos: 'v.' },
+                { word: 'slash', pos: 'v.' },
+                { word: 'domain', pos: 'n.' },
+                { word: 'retain', pos: 'v.' },
+                { word: 'eagle', pos: 'n.' },
+                { word: 'render', pos: 'v.' },
+                { word: 'interfere', pos: 'v.' },
+                { word: 'intimidate', pos: 'v.' },
+                { word: 'grip', pos: 'v.' },
+                { word: 'entail', pos: 'v.' },
+                { word: 'embed', pos: 'v.' },
+                { word: 'iceberg', pos: 'n.' },
+                { word: 'justification', pos: 'n.' },
+                { word: 'contend', pos: 'v.' },
+                { word: 'legacy', pos: 'n.' },
+                { word: 'lounge', pos: 'n.' },
+                { word: 'machinery', pos: 'n.' },
+                { word: 'refrain', pos: 'v.' },
+                { word: 'mindset', pos: 'n.' },
+                { word: 'dedicate', pos: 'v.' },
+                { word: 'morality', pos: 'n.' },
+                { word: 'confine', pos: 'v.' },
+                { word: 'quest', pos: 'n.' },
+                { word: 'revelation', pos: 'n.' },
+                { word: 'defeat', pos: 'v.' },
+                { word: 'spouse', pos: 'n.' },
+                { word: 'acquaintance', pos: 'n.' },
+                { word: 'deploy', pos: 'v.' },
+                { word: 'intrigue', pos: 'v.' },
+                { word: 'allure', pos: 'v.' },
+                { word: 'owe', pos: 'v.' },
+                { word: 'aristocrat', pos: 'n.' },
+                { word: 'plunge', pos: 'v.' },
+                { word: 'assault', pos: 'n.' },
+                { word: 'presume', pos: 'v.' },
+                { word: 'brew', pos: 'v.' },
+                { word: 'casulty', pos: 'n.' },
+                { word: 'blur', pos: 'v.' },
+                { word: 'clip', pos: 'n.' },
+                { word: 'displace', pos: 'v.' }
+            ],
+            'u20': [
+                { word: 'embark', pos: 'v.' },
+                { word: 'elaborate', pos: 'adj.' },
+                { word: 'scenario', pos: 'n.' },
+                { word: 'tactic', pos: 'n.' },
+                { word: 'enlighten', pos: 'v.' },
+                { word: 'endeavor', pos: 'n.' },
+                { word: 'envisage', pos: 'v.' },
+                { word: 'pool', pos: 'v.' },
+                { word: 'transit', pos: 'n.' },
+                { word: 'hamper', pos: 'v.' },
+                { word: 'extent', pos: 'n.' },
+                { word: 'evade', pos: 'v.' },
+                { word: 'coincide', pos: 'v.' },
+                { word: 'embody', pos: 'v.' },
+                { word: 'entity', pos: 'n.' },
+                { word: 'duplicate', pos: 'n.' },
+                { word: 'stroke', pos: 'n.' },
+                { word: 'illuminate', pos: 'v.' },
+                { word: 'crave', pos: 'v.' },
+                { word: 'dwell on', pos: 'phr.v.' },
+                { word: 'dwell', pos: 'v.' },
+                { word: 'code', pos: 'n.' },
+                { word: 'coin', pos: 'v.' },
+                { word: 'romance', pos: 'v.' },
+                { word: 'cheap', pos: 'adj.' },
+                { word: 'clock', pos: 'v.' },
+                { word: 'prey', pos: 'v.' },
+                { word: 'dock', pos: 'n.' },
+                { word: 'crop', pos: 'v.' },
+                { word: 'syndrome', pos: 'n.' }
+            ],
+            'high_frequency': [
+                { word: 'thrive', pos: 'v.', meaning: '蓬勃发展；繁荣' },
+                { word: 'executive', pos: 'n./adj.', meaning: '执行；行政的' },
+                { word: 'exotic', pos: 'adj.', meaning: '异域的；外来的' },
+                { word: 'severe', pos: 'adj.', meaning: '严峻的；严重的' },
+                { word: 'modify', pos: 'v.', meaning: '调整；使温和' },
+                { word: 'account', pos: 'n./v.', meaning: '解释；账户；报告' },
+                { word: 'collaboration', pos: 'n.', meaning: '协作；合作' },
+                { word: 'whereas', pos: 'conj.', meaning: '而；然而' },
+                { word: 'corporate', pos: 'adj.', meaning: '企业的；公司的' },
+                { word: 'norm', pos: 'n.', meaning: '规范；标准' },
+                { word: 'tribe', pos: 'n.', meaning: '部落；族群' },
+                { word: 'underestimate', pos: 'v.', meaning: '低估；轻视' },
+                { word: 'virgin', pos: 'adj./n.', meaning: '原始的；未开发的' },
+                { word: 'debris', pos: 'n.', meaning: '碎片；残骸' },
+                { word: 'dramatic', pos: 'adj.', meaning: '突然的；戏剧的' },
+                { word: 'incorporate', pos: 'v.', meaning: '包含；注册成立' },
+                { word: 'restore', pos: 'v.', meaning: '恢复；修复' },
+                { word: 'adverse', pos: 'adj.', meaning: '不利的；有害的' },
+                { word: 'alert', pos: 'adj./n./v.', meaning: '警觉的；警报' },
+                { word: 'reveal', pos: 'v.', meaning: '揭示；显示' },
+                { word: 'appeal', pos: 'n./v.', meaning: '呼吁；吸引力' },
+                { word: 'assume', pos: 'v.', meaning: '承担；假设' },
+                { word: 'destructive', pos: 'adj.', meaning: '破坏性的' },
+                { word: 'impact', pos: 'n./v.', meaning: '冲击；影响' },
+                { word: 'hypothesis', pos: 'n.', meaning: '假设；假说' },
+                { word: 'incentive', pos: 'n.', meaning: '激励；动机' },
+                { word: 'impose', pos: 'v.', meaning: '施加；强加' },
+                { word: 'purchase', pos: 'v./n.', meaning: '购买；握紧' },
+                { word: 'phenomenon', pos: 'n.', meaning: '杰出的人；现象' },
+                { word: 'upgrade', pos: 'v./n.', meaning: '升级；提升' },
+                { word: 'sophisticated', pos: 'adj.', meaning: '复杂的；精密的' },
+                { word: 'alternative', pos: 'adj./n.', meaning: '替代的；选择' },
+                { word: 'bizarre', pos: 'adj.', meaning: '奇怪的；古怪的' },
+                { word: 'haven', pos: 'n.', meaning: '避风港；安全的地方' },
+                { word: 'deficit', pos: 'n.', meaning: '赤字；亏损' },
+                { word: 'adequate', pos: 'adj.', meaning: '充足的；足够的' },
+                { word: 'revenue', pos: 'n.', meaning: '收入；收益' },
+                { word: 'ambitious', pos: 'adj.', meaning: '耗资的；耗时的；雄心勃勃的' },
+                { word: 'antibiotic', pos: 'n.', meaning: '抗生素' },
+                { word: 'interpret', pos: 'v.', meaning: '解释；翻译' },
+                { word: 'electric', pos: 'adj.', meaning: '充满刺激的；电的' },
+                { word: 'institute', pos: 'v./n.', meaning: '建立（体系、政策）；机构' },
+                { word: 'crash', pos: 'v./n./adj.', meaning: '倒闭；崩溃；速成的' },
+                { word: 'significant', pos: 'adj.', meaning: '意味深长的；重要的' },
+                { word: 'diminish', pos: 'v.', meaning: '减少；削弱' },
+                { word: 'brand', pos: 'v./n.', meaning: '（尤指不公正地）丑化某人；品牌' },
+                { word: 'grant', pos: 'v./n.', meaning: '授予；拨款' },
+                { word: 'vulnerable', pos: 'adj.', meaning: '脆弱的；易受伤害的' },
+                { word: 'infant', pos: 'n.', meaning: '婴儿；幼儿' },
+                { word: 'overwheln', pos: 'v.', meaning: '压垮；使不知所措' },
+                { word: 'intellectual', pos: 'adj./n.', meaning: '智力的；知识分子' },
+                { word: 'yield', pos: 'v./n.', meaning: '产生；屈服' },
+                { word: 'ideal', pos: 'adj./n.', meaning: '理想的；完美的人' },
+                { word: 'intensive', pos: 'adj.', meaning: '强化的；密集的' },
+                { word: 'accuse', pos: 'v.', meaning: '指责；控告' },
+                { word: 'perspective', pos: 'n.', meaning: '视角；观点' },
+                { word: 'isolate', pos: 'v.', meaning: '隔离；孤立' },
+                { word: 'cope', pos: 'v.', meaning: '应对；处理' },
+                { word: 'artificial', pos: 'adj.', meaning: '虚假的；人工的' },
+                { word: 'contract', pos: 'v./n.', meaning: '收缩；感染疾病；合同' },
+                { word: 'portray', pos: 'v.', meaning: '描绘；刻画' },
+                { word: 'vital', pos: 'adj.', meaning: '生机勃勃的；至关重要的' },
+                { word: 'exhibit', pos: 'v./n.', meaning: '展示；展览' },
+                { word: 'consist', pos: 'v.', meaning: '存在于；由...组成' },
+                { word: 'generate', pos: 'v.', meaning: '产生；引起' },
+                { word: 'dual', pos: 'adj.', meaning: '双重的；双的' },
+                { word: 'tackle', pos: 'v.', meaning: '处理；解决' },
+                { word: 'compel', pos: 'v.', meaning: '迫使；强迫' },
+                { word: 'notion', pos: 'n.', meaning: '概念；想法' },
+                { word: 'radical', pos: 'adj.', meaning: '激进的；根本的' },
+                { word: 'elite', pos: 'n./adj.', meaning: '精英；精英的' },
+                { word: 'trial', pos: 'n./adj.', meaning: '试验；审判' },
+                { word: 'ultimate', pos: 'adj.', meaning: '最终的；终极的' },
+                { word: 'patent', pos: 'n./v.', meaning: '专利；获得专利' },
+                { word: 'absorb', pos: 'v.', meaning: '吸收；使全神贯注' },
+                { word: 'recession', pos: 'n.', meaning: '衰退；经济萧条' },
+                { word: 'deprive', pos: 'v.', meaning: '剥夺；使失去' },
+                { word: 'faculty', pos: 'n.', meaning: '官能；才能；教职员工' },
+                { word: 'capacity', pos: 'n.', meaning: '能力；功率' },
+                { word: 'discount', pos: 'v./n.', meaning: '认为...不重要；折扣' },
+                { word: 'appropriate', pos: 'adj./v.', meaning: '适当的；盗用；挪用' },
+                { word: 'extract', pos: 'v./n.', meaning: '提取；摘录' },
+                { word: 'management', pos: 'n.', meaning: '资方；（有效的）处理能力' },
+                { word: 'depict', pos: 'v.', meaning: '描绘；描述' },
+                { word: 'graphic', pos: 'adj./n.', meaning: '图形的；生动的' },
+                { word: 'investigate', pos: 'v.', meaning: '调查；研究' },
+                { word: 'accord', pos: 'n./v.', meaning: '一致；协议' },
+                { word: 'reluctant', pos: 'adj.', meaning: '不情愿的；勉强的' },
+                { word: 'predator', pos: 'n.', meaning: '捕食者；掠夺者' },
+                { word: 'climate', pos: 'n.', meaning: '气候；思潮；风气' },
+                { word: 'excessive', pos: 'adj.', meaning: '过度的；过分的' },
+                { word: 'celebrity', pos: 'n.', meaning: '名人；名流' },
+                { word: 'obtain', pos: 'v.', meaning: '获得；存在；流行' },
+                { word: 'circulation', pos: 'n.', meaning: '流通；发行量' },
+                { word: 'assert', pos: 'v.', meaning: '断言；坚持' },
+                { word: 'distinct', pos: 'adj.', meaning: '明显的；独特的' },
+                { word: 'fatigue', pos: 'n.', meaning: '疲劳；疲惫' },
+                { word: 'fake', pos: 'adj./n./v.', meaning: '虚假的；伪造' },
+                { word: 'fuel', pos: 'n./v.', meaning: '燃料；言论、刺激性言论' },
+                { word: 'rational', pos: 'adj.', meaning: '理性的；合理的' },
+                { word: 'exaggerate', pos: 'v.', meaning: '夸大；夸张' },
+                { word: 'solution', pos: 'n.', meaning: '解决方案；溶液；溶解（过程）' },
+                { word: 'distract', pos: 'v.', meaning: '分散；使分心' },
+                { word: 'modest', pos: 'adj.', meaning: '谦虚的；适度的' },
+                { word: 'census', pos: 'n.', meaning: '人口普查' },
+                { word: 'credit', pos: 'n./v.', meaning: '信贷；信用' },
+                { word: 'poverty', pos: 'n.', meaning: '贫困；劣质' },
+                { word: 'coral', pos: 'n./adj.', meaning: '珊瑚；红色的；粉红的' },
+                { word: 'stereotype', pos: 'n./v.', meaning: '刻板印象；模式化' },
+                { word: 'domestic', pos: 'adj.', meaning: '国内的；家庭的' },
+                { word: 'irritate', pos: 'v.', meaning: '激怒；刺激' },
+                { word: 'obligation', pos: 'n.', meaning: '义务；责任' },
+                { word: 'brief', pos: 'adj./n./v.', meaning: '简要的；简报' },
+                { word: 'obsess', pos: 'v.', meaning: '沉迷；着迷' },
+                { word: 'counterpart', pos: 'n.', meaning: '对应的人或物' },
+                { word: 'chronic', pos: 'adj.', meaning: '慢性的；长期患病的；拙劣的' },
+                { word: 'tremendous', pos: 'adj.', meaning: '巨大的；极大的' },
+                { word: 'commit', pos: 'v.', meaning: '犯罪；自杀；承诺' },
+                { word: 'bound', pos: 'adj./v./n.', meaning: '必定；束缚' },
+                { word: 'reserve', pos: 'v./n.', meaning: '储备；自然保护区；预订' },
+                { word: 'virtual', pos: 'adj.', meaning: '事实上的；虚拟的' },
+                { word: 'moral', pos: 'adj./n.', meaning: '道德的；道德' },
+                { word: 'subtle', pos: 'adj.', meaning: '细微的；微妙的' },
+                { word: 'texture', pos: 'n.', meaning: '质地；纹理' },
+                { word: 'rigorous', pos: 'adj.', meaning: '严格的；严谨的' },
+                { word: 'prolong', pos: 'v.', meaning: '延长；拖延' },
+                { word: 'cognitive', pos: 'adj.', meaning: '认知的' },
+                { word: 'court', pos: 'n./v.', meaning: '法庭；试图取悦' },
+                { word: 'indulge', pos: 'v.', meaning: '沉迷；纵容' },
+                { word: 'hazard', pos: 'n./v.', meaning: '危险；危害' },
+                { word: 'burden', pos: 'n./v.', meaning: '负担；使负担' },
+                { word: 'considerable', pos: 'adj.', meaning: '相当大的；可观的' },
+                { word: 'medium', pos: 'n./adj.', meaning: '媒介；中等的' },
+                { word: 'region', pos: 'n.', meaning: '地区；身体部位' },
+                { word: 'profile', pos: 'n./v.', meaning: '形象；轮廓' },
+                { word: 'exploit', pos: 'v./n.', meaning: '利用；开发' },
+                { word: 'exhaust', pos: 'v./n.', meaning: '耗尽；疲惫' },
+                { word: 'persistent', pos: 'adj.', meaning: '持续的；坚持不懈的' },
+                { word: 'premium', pos: 'n./adj.', meaning: '保险费；高昂的；优质的' },
+                { word: 'sacrifice', pos: 'n./v.', meaning: '牺牲；献祭' },
+                { word: 'devise', pos: 'v.', meaning: '设计；想出' },
+                { word: 'deteriorate', pos: 'v.', meaning: '恶化；退化' },
+                { word: 'exclude', pos: 'v.', meaning: '排斥；排除' },
+                { word: 'possess', pos: 'v.', meaning: '拥有；支配；控制；使言行失常' },
+                { word: 'proof', pos: 'n./adj.', meaning: '证明；证据' },
+                { word: 'profession', pos: 'n.', meaning: '职业；同行；宣传' },
+                { word: 'hinder', pos: 'v.', meaning: '阻碍；妨碍' },
+                { word: 'foster', pos: 'v.', meaning: '促进；培养' },
+                { word: 'float', pos: 'v./n.', meaning: '浮动；股票上市' },
+                { word: 'derive', pos: 'v.', meaning: '得出；源自' },
+                { word: 'trait', pos: 'n.', meaning: '特征；特点' },
+                { word: 'scheme', pos: 'n./v.', meaning: '计划；方案' },
+                { word: 'array', pos: 'n./v.', meaning: '一系列；排列' },
+                { word: 'trigger', pos: 'v./n.', meaning: '触发；引发' },
+                { word: 'cherish', pos: 'v.', meaning: '珍惜；珍爱' },
+                { word: 'intiative', pos: 'n.', meaning: '倡议；主动性' },
+                { word: 'deplete', pos: 'v.', meaning: '耗尽；消耗' },
+                { word: 'correlate', pos: 'v./n.', meaning: '关联；相关' },
+                { word: 'eliminate', pos: 'v.', meaning: '消除；排除' },
+                { word: 'consensus', pos: 'n.', meaning: '共识；一致意见' },
+                { word: 'counter', pos: 'v./n./adj.', meaning: '对抗；反驳' },
+                { word: 'confront', pos: 'v.', meaning: '面对；对抗' },
+                { word: 'dinosaur', pos: 'n.', meaning: '恐龙；守旧落伍的人；过时落后的东西' },
+                { word: 'demonstrate', pos: 'v.', meaning: '展示；证明' },
+                { word: 'epidemic', pos: 'n./adj.', meaning: '流行病；流行的' },
+                { word: 'congress', pos: 'n.', meaning: '国会；代表大会' },
+                { word: 'controversy', pos: 'n.', meaning: '争议；争论' },
+                { word: 'shrink', pos: 'v.', meaning: '收缩；萎缩' },
+                { word: 'pasta', pos: 'n.', meaning: '意大利面' },
+                { word: 'pest', pos: 'n.', meaning: '害虫；有害物' },
+                { word: 'assign', pos: 'v.', meaning: '分配；指派' },
+                { word: 'pose', pos: 'v./n.', meaning: '造成；提问；质询；姿势' },
+                { word: 'neglect', pos: 'v./n.', meaning: '忽视；忽略' },
+                { word: 'bother', pos: 'v./n.', meaning: '打扰；麻烦' }
+            ]
+        };
+
+        function renderVocabularyList(id) {
+            const container = document.getElementById('vocab-sublist');
+            if (!container) return;
+            const vocabList = unitVocabulary[id];
+            if (!vocabList || vocabList.length === 0) {
+                container.innerHTML = `
+                    <p class="text-sm text-gray-500">该单元暂无词汇列表。</p>
+                `;
+                return;
+            }
+            const itemsHtml = vocabList.map(item => {
+                const key = item.word.toLowerCase();
+                const meaning = item.meaning || vocabMeanings[key] || '暂无释义';
+                return `
+                    <li>
+                        <button type="button" class="vocab-button" data-word="${key}">
+                            ${item.word}
+                            <span>${item.pos} ${meaning}</span>
+                        </button>
+                    </li>
+                `;
+            }).join('');
+            container.innerHTML = `
+                <ul>
+                    ${itemsHtml}
+                </ul>
+            `;
+        }
+
+        /**
+         * 点击文章中的单词时，滚动索引区域到对应位置
+         * @param {string} word 单词（小写）
+         */
+        function scrollIndexToWord(word) {
+            if (!word) return;
+            const vocabIndex = document.getElementById('vocab-index');
+            if (!vocabIndex) return;
+            
+            const lowerWord = word.toLowerCase();
+            let button = vocabIndex.querySelector(`button[data-word="${lowerWord}"]`);
+            
+            // 如果直接匹配失败，尝试词形还原
+            if (!button) {
+                const baseForms = getWordBaseForms(lowerWord);
+                for (const baseForm of baseForms) {
+                    button = vocabIndex.querySelector(`button[data-word="${baseForm}"]`);
+                    if (button) break;
+                }
+            }
+            
+            if (!button) return;
+            
+            const containerRect = vocabIndex.getBoundingClientRect();
+            const buttonRect = button.getBoundingClientRect();
+            const offset = buttonRect.top - containerRect.top + vocabIndex.scrollTop - 40;
+            vocabIndex.scrollTo({
+                top: offset,
+                behavior: 'smooth'
+            });
+            // 添加临时高亮效果
+            button.classList.add('vocab-highlight');
+            setTimeout(() => button.classList.remove('vocab-highlight'), 1500);
+        }
+
+        // Initialize by showing U17 content (or wait for user click)
+        window.onload = () => {
+             // You can uncomment the line below to load U17 content automatically on page load
+             showContent('u17');
+        };
+    </script>
+</body>
+</html>
