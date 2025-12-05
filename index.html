@@ -46,26 +46,26 @@
         .vocab-button {
             width: 100%;
             text-align: left;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: #111827;
+            border: 1px solid #374151;
             border-radius: 0.5rem;
             padding: 0.35rem 0.5rem;
             font-size: 0.9rem;
-            color: #0f172a;
+            color: #e5e7eb;
             transition: background 0.15s, border 0.15s;
             cursor: default;
         }
         .vocab-button:hover {
-            background: #e0e7ff;
+            background: #1f2937;
             border-color: #6366f1;
         }
         .vocab-button span {
             display: block;
             font-size: 0.8rem;
-            color: #475569;
+            color: #94a3b8;
         }
         .vocab-highlight {
-            background-color: #fef3c7;
+            background-color: #4b5563;
             transition: background-color 1s ease;
         }
         /* 词汇索引区域样式 */
@@ -111,6 +111,10 @@
         .vocab:hover {
             text-decoration: underline;
         }
+        /* 自定义深色背景 */
+        .bg-gray-850 {
+            background-color: #1f2937;
+        }
     </style>
     <script>
         tailwind.config = {
@@ -124,45 +128,45 @@
         }
     </script>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-900 text-gray-100 font-sans">
     <div id="app-container" class="flex flex-col md:flex-row">
         <!-- 左侧目录条 -->
-        <div id="sidebar" class="w-full md:w-48 bg-white border-r border-gray-200 p-4 shadow-lg flex-shrink-0">
-            <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">词汇目录</h2>
+        <div id="sidebar" class="w-full md:w-48 bg-gray-850 border-r border-gray-700 p-4 shadow-lg flex-shrink-0">
+            <h2 class="text-xl font-bold text-gray-100 mb-6 border-b border-gray-700 pb-2">词汇目录</h2>
             <ul class="space-y-2">
                 <li>
                     <a href="#" onclick="showContent('u11'); return false;" id="u11-link"
-                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                       class="block px-4 py-2 text-lg text-gray-100 rounded-lg transition-colors duration-200 hover:bg-gray-800">
                         U11
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="showContent('u12'); return false;" id="u12-link"
-                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                       class="block px-4 py-2 text-lg text-gray-100 rounded-lg transition-colors duration-200 hover:bg-gray-800">
                         U12
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="showContent('u13'); return false;" id="u13-link"
-                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                       class="block px-4 py-2 text-lg text-gray-100 rounded-lg transition-colors duration-200 hover:bg-gray-800">
                         U13
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="showContent('u14'); return false;" id="u14-link"
-                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                       class="block px-4 py-2 text-lg text-gray-100 rounded-lg transition-colors duration-200 hover:bg-gray-800">
                         U14
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="showContent('u15'); return false;" id="u15-link"
-                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                       class="block px-4 py-2 text-lg text-gray-100 rounded-lg transition-colors duration-200 hover:bg-gray-800">
                         U15
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="showContent('u16'); return false;" id="u16-link"
-                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                       class="block px-4 py-2 text-lg text-gray-100 rounded-lg transition-colors duration-200 hover:bg-gray-800">
                         U16
                     </a>
                 </li>
@@ -174,25 +178,25 @@
                 </li>
                 <li>
                     <a href="#" onclick="showContent('u18'); return false;" id="u18-link"
-                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                       class="block px-4 py-2 text-lg text-gray-100 rounded-lg transition-colors duration-200 hover:bg-gray-800">
                         U18
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="showContent('u19'); return false;" id="u19-link"
-                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                       class="block px-4 py-2 text-lg text-gray-100 rounded-lg transition-colors duration-200 hover:bg-gray-800">
                         U19
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="showContent('u20'); return false;" id="u20-link"
-                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                       class="block px-4 py-2 text-lg text-gray-100 rounded-lg transition-colors duration-200 hover:bg-gray-800">
                         U20
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="showContent('high_frequency'); return false;" id="high_frequency-link"
-                       class="block px-4 py-2 text-lg text-gray-700 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+                       class="block px-4 py-2 text-lg text-gray-100 rounded-lg transition-colors duration-200 hover:bg-gray-800">
                         高频词汇
                     </a>
                 </li>
@@ -205,20 +209,20 @@
                 <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500 mx-auto"></div>
                 <p class="mt-4 text-indigo-600">正在加载音频...</p>
             </div>
-            <div id="content-display" class="bg-white p-6 md:p-10 rounded-xl shadow-2xl">
+            <div id="content-display" class="bg-gray-850 p-6 md:p-10 rounded-xl shadow-2xl border border-gray-700">
                 <!-- 内容将在此处显示 -->
-                <h1 id="article-title" class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 border-b pb-4"></h1>
-                <div id="article-body" class="text-gray-700 space-y-8 leading-relaxed">
-                    <p class="text-xl text-center text-gray-500 mt-20" id="initial-message">请从左侧目录选择 U17 或 U18 查看文章。</p>
+                <h1 id="article-title" class="text-3xl md:text-4xl font-extrabold text-gray-100 mb-6 border-b border-gray-700 pb-4"></h1>
+                <div id="article-body" class="text-gray-200 space-y-8 leading-relaxed">
+                    <p class="text-xl text-center text-gray-400 mt-20" id="initial-message">请从左侧目录选择 U17 或 U18 查看文章。</p>
                 </div>
             </div>
         </div>
 
         <!-- 右侧词汇索引 -->
-        <div id="vocab-index" class="w-full md:w-72 bg-white border-l border-gray-200 p-4 shadow-lg flex-shrink-0">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">词汇索引</h2>
+        <div id="vocab-index" class="w-full md:w-72 bg-gray-850 border-l border-gray-700 p-4 shadow-lg flex-shrink-0 text-gray-100">
+            <h2 class="text-xl font-bold text-gray-100 mb-4 border-b border-gray-700 pb-2">词汇索引</h2>
             <div id="vocab-sublist">
-                <p class="text-sm text-gray-500">请选择一个单元以加载词汇。</p>
+                <p class="text-sm text-gray-400">请选择一个单元以加载词汇。</p>
             </div>
         </div>
     </div>
@@ -674,8 +678,8 @@
 
                 html += `
                     <div class="paragraph border-l-4 border-indigo-400 pl-4 py-2">
-                        <div class="english text-lg text-gray-900">${processedEn}</div>
-                        <div class="chinese text-base text-gray-500 mt-1">${p.zh}</div>
+                        <div class="english text-lg text-gray-200">${processedEn}</div>
+                        <div class="chinese text-base text-gray-400 mt-1">${p.zh}</div>
                     </div>
                 `;
             });
@@ -701,12 +705,12 @@
             // 2. Update Sidebar Active State
             document.querySelectorAll('#sidebar a').forEach(link => {
                 link.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'text-white');
-                link.classList.add('text-gray-700', 'hover:bg-gray-100');
+                link.classList.add('text-gray-100', 'hover:bg-gray-800');
             });
 
             const activeLink = document.getElementById(`${id}-link`);
             if (activeLink) {
-                activeLink.classList.remove('text-gray-700', 'hover:bg-gray-100');
+                activeLink.classList.remove('text-gray-100', 'hover:bg-gray-800');
                 activeLink.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'text-white');
             }
             // 3. 同步更新左侧词汇索引
